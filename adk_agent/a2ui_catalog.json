@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "catalogId": "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json",
+  "title": "Augustana University (Sioux Falls, SD) Accessible Academic Advising A2UI Component Catalog",
+  "description": "Declarative A2UI v0.9 component catalog for the Augustana Academic Advising Agent (AAA), enforcing WCAG 2.2 AA/AAA screen-reader semantics, Sioux Falls Navy (#081E3F) & Gold (#FED102) contrast, non-color status badges, plain-language higher-ed glossary tags, and F-1 international student guardrails.",
+  "components": {
+    "Column": {
+      "description": "Vertical layout container with an accessible region label.",
+      "required": ["a11yLabel", "children"],
+      "properties": {
+        "a11yLabel": { "type": "string" },
+        "children": {
+          "type": "object",
+          "properties": {
+            "explicitList": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "AlertBanner": {
+      "description": "Visual and screen-reader accessible alert banner with zero audio-only dependencies.",
+      "required": ["severity", "icon", "title", "message"],
+      "properties": {
+        "severity": { "type": "string", "enum": ["info", "warning", "danger", "success"] },
+        "icon": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "jargonTerms": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "KPIStatRow": {
+      "description": "Grid of key performance indicator cards with non-color delta indicators.",
+      "required": ["a11yLabel", "itemsPath"],
+      "properties": {
+        "a11yLabel": { "type": "string" },
+        "itemsPath": { "type": "string" }
+      }
+    },
+    "DataTable": {
+      "description": "Accessible semantic HTML table with mandatory screen-reader caption, row header key, Zion Cloud Solutions field mapping, and keyboard-sortable columns.",
+      "required": ["title", "a11yCaption", "a11ySummary", "rowHeaderKey", "rowsPath", "columns"],
+      "properties": {
+        "title": { "type": "string" },
+        "a11yCaption": { "type": "string" },
+        "a11ySummary": { "type": "string" },
+        "rowHeaderKey": { "type": "string" },
+        "rowsPath": { "type": "string" },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label"],
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "zionField": { "type": "string" },
+              "type": { "type": "string", "enum": ["string", "number", "badge"] },
+              "jargon": { "type": "string" },
+              "sortable": { "type": "boolean" }
+            }
+          }
+        },
+        "rowActions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "icon": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "DegreeProgressCard": {
+      "description": "Accessible progress bars tracking 124-credit degree completion, SOPHIA Core, and F-1 12-credit status.",
+      "required": ["title", "itemsPath"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "itemsPath": { "type": "string" }
+      }
+    },
+    "ActionFormCard": {
+      "description": "Interactive form that emits an A2UI actionResponse back to the Google ADK agent.",
+      "required": ["title", "fields", "submitLabel", "actionName"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "fields": { "type": "array" },
+        "submitLabel": { "type": "string" },
+        "actionName": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "disclaimer": "HYPOTHETICAL SYNTHETIC DATASET FOR A2UI DESIGN HACKATHON — Awaiting official Zion Cloud Solutions field list.",
+  "institution": {
+    "name": "Augustana University",
+    "location": "Sioux Falls, South Dakota",
+    "domain": "augie.edu",
+    "mascot": "Vikings",
+    "colors": {
+      "augieNavy": "#081E3F",
+      "augieGold": "#FED102",
+      "augieLightBlue": "#8D9EBC",
+      "augieGreen": "#789D4A"
+    }
+  },
+  "universityMetrics": {
+    "firstToSecondYearRetention": "86.4%",
+    "fourYearGraduationRate": "71.8%",
+    "overallCourseCompletionRate": "93.2%",
+    "globalAdvisorToStudentRatio": "1 : 18.4",
+    "unassignedAdviseesCount": 42,
+    "activePortalUsersNow": 318,
+    "degreeProgressChecksLastMonth": 1420,
+    "studentsWithSystemicHolds": 164
+  },
+  "sampleAdvisees": [
+    {
+      "student_id": "AUG-2027-1042",
+      "student_name": "Amina Tesfaye",
+      "cohort": "Junior (Class of 2027)",
+      "academic_unit": "Natural Sciences Area",
+      "department": "Computer Science & Mathematics",
+      "major_program": "Data Science & Computer Science (B.A.)",
+      "assigned_advisor": "Dr. Matthewulat / CS Faculty Advisor",
+      "credits_completed": 78,
+      "current_term_credits": 14,
+      "sophia_gen_ed_status": "✓ 9 of 10 SOPHIA Categories Complete (Needs Religion R2)",
+      "registration_holds": "✓ Clear (Eligible for Nov 12 Window)",
+      "academic_standing": "✓ Good Standing (SAP Met — 3.74 GPA)",
+      "early_warning_flags": "✓ 0 Active Alerts",
+      "visa_international_status": "🌐 F-1 International (14 cr — Above 12 cr SEVIS Min)",
+      "accessibility_accommodations": "Screen Reader (NVDA) + Multilingual Glossary (English / Amharic)",
+      "next_semester_registered": "No — Waiting on Data Science Capstone Prereq Check"
+    },
+    {
+      "student_id": "AUG-2028-2198",
+      "student_name": "Lucas Sorenson",
+      "cohort": "Sophomore (Class of 2028)",
+      "academic_unit": "School of Music",
+      "department": "Music",
+      "major_program": "Music Education (B.A.)",
+      "assigned_advisor": "Dr. Folliard / Music Faculty Advisor",
+      "credits_completed": 44,
+      "current_term_credits": 16,
+      "sophia_gen_ed_status": "⚠ 5 of 10 SOPHIA Categories Complete",
+      "registration_holds": "⛔ Advising Hold (Pin Required)",
+      "academic_standing": "✓ Good Standing (SAP Met — 3.18 GPA)",
+      "early_warning_flags": "⚠ 1 Alert: MUSI 214 Aural Skills II Midterm C-",
+      "visa_international_status": "Domestic Student",
+      "accessibility_accommodations": "Deaf / Hard-of-Hearing — Real-Time Captioning & Visual Alerts Enabled",
+      "next_semester_registered": "No — Advising Hold Active"
+    },
+    {
+      "student_id": "AUG-2026-0881",
+      "student_name": "Priya Gurung",
+      "cohort": "Senior (Class of 2026)",
+      "academic_unit": "Natural Sciences Area",
+      "department": "Nursing",
+      "major_program": "Nursing (B.S.N.)",
+      "assigned_advisor": "Prof. Sarah Lindstrom",
+      "credits_completed": 112,
+      "current_term_credits": 12,
+      "sophia_gen_ed_status": "✓ 10 of 10 SOPHIA Complete",
+      "registration_holds": "✓ Clear",
+      "academic_standing": "✓ Good Standing (3.88 GPA — Graduation Candidate)",
+      "early_warning_flags": "✓ 0 Active Alerts",
+      "visa_international_status": "🌐 F-1 International (⚠ Dropping 1 course would drop below 12 cr limit!)",
+      "accessibility_accommodations": "Plain-Language Clinical & Licensing Terminology Enabled (Nepali/English)",
+      "next_semester_registered": "Yes — Registered (12 cr Spring Capstone)"
+    },
+    {
+      "student_id": "AUG-2029-3310",
+      "student_name": "Jordanchnik Rivera",
+      "cohort": "First-Year (Class of 2029)",
+      "academic_unit": "Social Sciences Area",
+      "department": "Business Administration",
+      "major_program": "Accounting & Finance (Exploring)",
+      "assigned_advisor": "Charlotte Snyder (Student Success)",
+      "credits_completed": 13,
+      "current_term_credits": 13,
+      "sophia_gen_ed_status": "⚠ 2 of 10 SOPHIA Complete (Enrolled in FYS 110)",
+      "registration_holds": "⛔ Financial Balance Hold ($420)",
+      "academic_standing": "⚠ Academic Warning (2.10 Midterm Est. — SAP Watch)",
+      "early_warning_flags": "⛔ 2 Alerts: Missed 3 classes in ECON 120; Midterm D+ in ACCT 210",
+      "visa_international_status": "Domestic First-Gen Transfer-Credit Student",
+      "accessibility_accommodations": "Low Vision — High-Contrast AAA & 150% Text Zoom Preferred",
+      "next_semester_registered": "No — Blocked by Financial Hold"
+    }
+  ]
+}

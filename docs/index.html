@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA) · A2UI + ADK 2-Hour Design Hackathon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Keyboard / Screen Reader Skip Navigation Links -->
+    <nav class="skip-links" aria-label="Skip Navigation">
+      <a href="#persona-pills-container" class="skip-link">Skip to 10 Advising Personas</a>
+      <a href="#sidebar-questions-list" class="skip-link">Skip to Persona Questions (Q1–Q10)</a>
+      <a href="#a2ui-live-canvas" class="skip-link">Skip to Live A2UI Persona Surface</a>
+    </nav>
+
+    <!-- Polite Screen-Reader Live Region -->
+    <div id="a11y-live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Top Accessibility, International & Zion Schema Utility Bar -->
+    <div class="a11y-utility-bar" role="region" aria-label="Accessibility, International Student Support, and Schema Controls">
+      <div class="a11y-utility-inner">
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.65rem;">
+          <span class="zion-banner-pill" title="Current fields are hypothetical pending tonight/tomorrow's official Zion Cloud Solutions field list">
+            ⚡ HYPOTHETICAL PRE-ZION SCHEMA
+          </span>
+          <button type="button" id="btn-open-zion-modal" class="a11y-btn" aria-haspopup="dialog">
+            🗂️ Zion Cloud Solutions Field Mapper
+          </button>
+        </div>
+
+        <div class="a11y-controls-group" role="group" aria-label="Universal Accessibility & International Controls">
+          <button type="button" id="btn-toggle-hc" class="a11y-btn" aria-pressed="false" title="Toggle WCAG 2.2 AAA High-Contrast Mode">
+            ◐ High-Contrast AAA
+          </button>
+          <label for="sel-text-scale" class="sr-only">Text and Tap Target Zoom</label>
+          <select id="sel-text-scale" class="a11y-select" aria-label="Text and Tap Target Zoom">
+            <option value="100">🔍 Zoom: 100%</option>
+            <option value="125">🔍 Zoom: 125% (Low Vision)</option>
+            <option value="150">🔍 Zoom: 150% (Large Print)</option>
+          </select>
+          <button type="button" id="btn-toggle-spacing" class="a11y-btn" aria-pressed="false" title="Expand reading line height and letter spacing">
+            ↔ Wide Reading Spacing
+          </button>
+          <button type="button" id="btn-toggle-glossary" class="a11y-btn" aria-pressed="false" title="Expand inline explanations of US higher-ed terminology for international & first-gen students">
+            🌐 Plain-Language Jargon Decoder
+          </button>
+          <label for="sel-intl-lang" class="sr-only">International Student Glossary Language</label>
+          <select id="sel-intl-lang" class="a11y-select" aria-label="International Student Glossary Language">
+            <option value="en">🌍 Glossary: English</option>
+            <option value="es">🌍 Español (Spanish)</option>
+            <option value="zh">🌍 中文 (Mandarin)</option>
+            <option value="ne">🌍 नेपाली (Nepali)</option>
+            <option value="am">🌍 አማርኛ (Amharic)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Augustana University (Sioux Falls, SD) Header -->
+    <header class="augie-header">
+      <div class="augie-header-inner">
+        <div class="augie-brand">
+          <div class="augie-crest" aria-hidden="true">
+            <span class="augie-crest-main">AU</span>
+            <span class="augie-crest-sub">1860 · SD</span>
+          </div>
+          <div>
+            <h1 class="augie-title">Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA)</h1>
+            <p class="augie-subtitle">
+              <span><strong>Gemini Enterprise Rollout</strong> · 2-Hour A2UI + Google ADK Interface Design Hackathon</span>
+              <span>·</span>
+              <span>10 Personas × 10 Questions = 100 Accessible Views</span>
+            </p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button type="button" id="btn-copy-agent-prompt" class="btn-augie-gold">
+            <span>🤖</span>
+            <span>Copy Prompt for Any Coding Agent</span>
+          </button>
+          <a href="https://docs.google.com/spreadsheets/d/1V_U0lXWP40WdDWyacq8QM_emvrwOKWCsPOZzZnWLooo/edit?gid=917434374#gid=917434374" target="_blank" rel="noopener noreferrer" class="btn-header-ghost">
+            <span>📊</span>
+            <span>Open AAA Persona Google Sheet</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workbench Content -->
+    <main class="workbench-container">
+      <!-- Executive Explainer Cards: What is ADK? What is A2UI? Why Accessibility & Open-Source Google CLI? -->
+      <section class="explainer-grid" aria-label="Core Concepts Overview">
+        <article class="explainer-card">
+          <h2>🧠 What is Google ADK (Agent Development Kit)?</h2>
+          <p>
+            <strong>Google ADK</strong> (<a href="https://github.com/google/adk-python" target="_blank" rel="noopener"><code>google/adk-python</code></a>) is Google's open-source framework powering Gemini Enterprise agents. In AAA, ADK loads the signed-in user's <strong>Persona System Prompt</strong>, enforces their <strong>Advising Scope (RBAC)</strong> (from <em>University-Wide</em> down to <em>Self Only</em>), and binds the A2UI component schema.
+          </p>
+        </article>
+        <article class="explainer-card gold-top">
+          <h2>🎨 What is A2UI (Agent-to-UI)?</h2>
+          <p>
+            <strong>A2UI</strong> (<a href="https://github.com/google/A2UI" target="_blank" rel="noopener"><code>google/A2UI</code></a>) is Google's open declarative UI protocol. Instead of returning walls of chat text, the ADK agent streams structured JSON (<code>surfaceUpdate</code> + <code>dataModelUpdate</code>) that renders native, interactive <strong>DataTables, KPI Cards, Progress Bars, and Approval Forms</strong>.
+          </p>
+        </article>
+        <article class="explainer-card green-top">
+          <h2>♿ Built for Blind, Deaf, Low-Vision &amp; International Vikings</h2>
+          <p>
+            Every A2UI component enforces <strong>WCAG 2.2 AA/AAA</strong>: screen-reader <code>&lt;caption&gt;</code> &amp; <code>scope</code> headers, 14.8:1+ Sioux Falls Navy/Gold contrast, icon+text badges, 100% visual parity (zero audio-only cues), plain-language US higher-ed glossary, and <strong>F-1 Visa 12-credit guardrails</strong>.
+          </p>
+        </article>
+      </section>
+
+      <!-- 10 Personas Switcher -->
+      <section class="persona-bar-section" aria-labelledby="persona-bar-heading">
+        <div class="persona-bar-header">
+          <h2 id="persona-bar-heading">1. Select an Academic Advising Persona (10 Roles from University-Wide to Student Self-Only)</h2>
+          <span style="font-size:0.82rem; color:var(--text-muted);">Click any persona to inspect its RBAC Scope, Companion Prompt, and A2UI Table View</span>
+        </div>
+        <div id="persona-pills-container" class="persona-pills" role="tablist" aria-label="Academic Advising Agent Personas"></div>
+      </section>
+
+      <!-- 2-Column Hackathon Workbench -->
+      <div class="workbench-main-grid">
+        <!-- Left Column: Active Persona Details & 10 Canonical Questions -->
+        <aside class="persona-sidebar" aria-label="Selected Persona Details and Canonical Questions">
+          <div class="persona-identity-header">
+            <div class="persona-identity-top">
+              <h2 id="sidebar-persona-title" class="persona-identity-title">🛡️ Admin</h2>
+            </div>
+            <div id="sidebar-persona-scope" class="scope-badge">Advising Scope: All (University-Wide)</div>
+            <div id="sidebar-persona-unit" style="font-size:0.78rem; color:#e2e8f0; margin-top:0.4rem;"></div>
+          </div>
+
+          <div class="persona-prompt-box">
+            <span class="persona-prompt-label">Companion System Message / Prompt (ADK Instruction)</span>
+            <blockquote id="sidebar-persona-prompt" class="persona-prompt-text"></blockquote>
+            <div id="sidebar-persona-roster"></div>
+          </div>
+
+          <div class="questions-panel">
+            <h3>2. Select a Canonical Persona Question (Q1–Q10)</h3>
+            <div id="sidebar-questions-list" class="question-list" role="list"></div>
+          </div>
+        </aside>
+
+        <!-- Right Column: Interactive A2UI Surface, Visual Table Builder, JSON Editor, A11y Audit & Hackathon Playbook -->
+        <section class="surface-workspace" aria-label="A2UI Surface and Design Tools">
+          <div class="surface-toolbar">
+            <div class="workspace-tabs" role="tablist" aria-label="Workbench Mode Tabs">
+              <button type="button" role="tab" class="ws-tab-btn" data-ws-tab="surface" aria-selected="true">
+                <span>🖥️</span>
+                <span>Live A2UI Persona View</span>
+              </button>
+              <button type="button" role="tab" class="ws-tab-btn" data-ws-tab="visual-builder" aria-selected="false">
+                <span>🛠️</span>
+                <span>Visual Table &amp; Column Designer</span>
+              </button>
+              <button type="button" role="tab" class="ws-tab-btn" data-ws-tab="json-editor" aria-selected="false">
+                <span>{ }</span>
+                <span>A2UI JSON Stream Editor</span>
+              </button>
+              <button type="button" role="tab" class="ws-tab-btn" data-ws-tab="a11y-audit" aria-selected="false">
+                <span>♿</span>
+                <span>Accessibility &amp; Screen-Reader Audit</span>
+              </button>
+              <button type="button" role="tab" class="ws-tab-btn" data-ws-tab="hackathon-guide" aria-selected="false">
+                <span>⏱️</span>
+                <span>2-Hour Hackathon &amp; Google CLI Guide</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pane 1: Live Rendered A2UI Surface -->
+          <div id="pane-surface">
+            <div id="a2ui-live-canvas"></div>
+          </div>
+
+          <!-- Pane 2: Visual Table & Column Designer (No-Code) -->
+          <div id="pane-visual-builder" class="builder-panel" hidden>
+            <div id="visual-builder-content"></div>
+          </div>
+
+          <!-- Pane 3: Live A2UI JSON Stream Editor -->
+          <div id="pane-json-editor" class="builder-panel" hidden>
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:0.75rem; margin-bottom:0.85rem;">
+              <div>
+                <h3 style="margin:0; color:var(--augie-navy);">Declarative A2UI JSON Payload (<code>surfaceUpdate</code> + <code>dataModelUpdate</code>)</h3>
+                <p style="margin:0.25rem 0 0; font-size:0.85rem; color:var(--text-muted);">
+                  Edit the JSON directly or paste the output from <strong>Google Gemini CLI</strong>, <strong>Antigravity</strong>, <strong>Workspace Gemini</strong>, <strong>Claude Code</strong>, or <strong>Cursor</strong>.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" id="btn-apply-json" class="btn-augie-primary">▶ Apply JSON to Live Surface</button>
+                <button type="button" id="btn-download-json" class="btn-augie-outline">📥 Download .json</button>
+              </div>
+            </div>
+            <label for="a2ui-json-textarea" class="sr-only">A2UI JSON Payload Editor</label>
+            <textarea id="a2ui-json-textarea" class="json-editor-textarea" spellcheck="false"></textarea>
+          </div>
+
+          <!-- Pane 4: Accessibility & Screen-Reader Audit -->
+          <div id="pane-a11y-audit" class="builder-panel" hidden>
+            <div id="a11y-audit-content"></div>
+          </div>
+
+          <!-- Pane 5: 2-Hour Hackathon Runbook & Trusted Open-Source Google CLI Toolchain -->
+          <div id="pane-hackathon-guide" class="builder-panel" hidden>
+            <h3 style="margin-top:0; color:var(--augie-navy);">⏱️ 2-Hour Design-Build Hackathon Agenda (Pete &amp; Terence Sprint + Campus Template)</h3>
+            <p style="font-size:0.9rem; color:var(--text-secondary);">
+              This hackathon focuses on <strong>interface &amp; table design</strong>—defining what each of the 10 Augustana personas needs to see and act on when asking their 10 questions, using hypothetical fields today and ready for <strong>Zion Cloud Solutions'</strong> official field list tonight/tomorrow.
+            </p>
+
+            <div class="a2ui-table-scroll" style="margin-bottom:1.5rem;">
+              <table class="a2ui-table">
+                <caption>2-Hour Hackathon Minute-by-Minute Run of Show</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Time Block</th>
+                    <th scope="col">Phase</th>
+                    <th scope="col">Focus &amp; Deliverable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">0:00 – 0:15 (15m)</th>
+                    <td><strong>1. Framing ADK + A2UI &amp; Accessibility</strong></td>
+                    <td>Review how Google ADK enforces Persona Scopes and how A2UI replaces chat prose with accessible tables, KPIs, and action cards.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">0:15 – 0:30 (15m)</th>
+                    <td><strong>2. Persona &amp; Scope Walkthrough</strong></td>
+                    <td>Click through the 10 personas (<code>Admin</code> → <code>Student</code>) and compare how the same student record (e.g., <em>Amina Tesfaye</em> or <em>Lucas Sorenson</em>) appears at each RBAC scope.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">0:30 – 1:30 (60m)</th>
+                    <td><strong>3. Hands-On Table &amp; View Design Sprint</strong></td>
+                    <td>Use the <strong>Visual Table Designer</strong> or click <strong>"Copy Prompt for Any Coding Agent"</strong> (with <code>gemini-cli</code>, Antigravity, Google Workspace for Education Plus, Claude, or Cursor) to refine columns, badges, and actions for priority personas.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1:30 – 1:50 (20m)</th>
+                    <td><strong>4. 360° Accessibility &amp; International Pressure Test</strong></td>
+                    <td>Test each designed view in the <strong>Accessibility &amp; Screen-Reader Audit</strong> tab (Blind narration, 150% Low-Vision zoom, High-Contrast AAA, Deaf visual parity, F-1 12-credit guardrail, and Multilingual Jargon Decoder).</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">1:50 – 2:00 (10m)</th>
+                    <td><strong>5. Export &amp; Zion Cloud Solutions Prep</strong></td>
+                    <td>Download or commit finalized A2UI JSON schemas to GitHub so they map directly to the incoming <strong>Zion Cloud Solutions</strong> field dictionary.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 style="color:var(--augie-navy);">🛠️ Trusted Open-Source Google CLI &amp; SDK Stack on GitHub</h3>
+            <div class="a2ui-table-scroll">
+              <table class="a2ui-table">
+                <caption>Official Open-Source Google Repositories Integrated in This Project</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Open-Source Google Tool</th>
+                    <th scope="col">GitHub Repository</th>
+                    <th scope="col">How We Use It in This Repo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Google Gemini CLI (<code>gemini</code>)</th>
+                    <td><a href="https://github.com/google-gemini/gemini-cli" target="_blank" rel="noopener"><code>google-gemini/gemini-cli</code></a></td>
+                    <td>Run <code>npx https://github.com/google-gemini/gemini-cli</code> in this repo; it automatically reads <code>GEMINI.md</code> to generate A2UI views.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Google Workspace CLI (<code>gws</code>)</th>
+                    <td><a href="https://github.com/googleworkspace/cli" target="_blank" rel="noopener"><code>googleworkspace/cli</code></a></td>
+                    <td>Run <code>./scripts/gws_sync_personas.sh</code> to sync the AAA Persona Google Sheet &amp; Google Groups via structured JSON.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Google ADK (<code>adk</code>)</th>
+                    <td><a href="https://github.com/google/adk-python" target="_blank" rel="noopener"><code>google/adk-python</code></a></td>
+                    <td>Run <code>adk web adk_agent</code> to launch the Python ADK Academic Advising Agent locally.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Google Agents CLI (<code>agents-cli</code>)</th>
+                    <td><a href="https://github.com/GoogleCloudPlatform/agent-starter-pack" target="_blank" rel="noopener"><code>GoogleCloudPlatform/agent-starter-pack</code></a></td>
+                    <td>Uses <code>.agents-cli-spec.md</code> for scaffolding, evaluation, and publishing to Gemini Enterprise.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Google A2UI (<code>a2ui-agent-sdk</code>)</th>
+                    <td><a href="https://github.com/google/A2UI" target="_blank" rel="noopener"><code>google/A2UI</code></a></td>
+                    <td>Defines the declarative JSON UI catalog (<code>adk_agent/a2ui_catalog.json</code>) and browser renderer (<code>docs/a2ui-renderer.js</code>).</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Google Apps Script CLI (<code>clasp</code>)</th>
+                    <td><a href="https://github.com/google/clasp" target="_blank" rel="noopener"><code>google/clasp</code></a></td>
+                    <td>Pushes <code>workspace_templates/AppsScript_Sheets_A2UI_Sidebar.gs</code> directly into Google Sheets for Workspace Education Plus users.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Zion Cloud Solutions Field Mapper Modal -->
+    <div id="zion-schema-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="zion-modal-title" hidden>
+      <div class="modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:0.85rem;">
+          <h2 id="zion-modal-title" style="margin:0; color:var(--augie-navy);">🗂️ Zion Cloud Solutions — Field Schema Adapter</h2>
+          <button type="button" id="btn-close-zion-modal" class="a2ui-action-btn">✕ Close</button>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-secondary); margin-top:0;">
+          All fields in today's hackathon are <strong>hypothetical</strong>. When <strong>Zion Cloud Solutions</strong> sends the official field list tonight or tomorrow, type or paste the official Zion field names below (or update <code>data/zion_schema_mapping.json</code>) to immediately update column mappings across all 10 persona views.
+        </p>
+        <div class="a2ui-table-scroll" style="max-height:420px; overflow-y:auto; margin-bottom:1rem;">
+          <table class="a2ui-table">
+            <caption>Mapping between Hypothetical Hackathon Fields and Incoming Zion Cloud Solutions Official Fields</caption>
+            <thead>
+              <tr>
+                <th scope="col">Hypothetical Key</th>
+                <th scope="col">Display Label</th>
+                <th scope="col">Official Zion Cloud Solutions Field Code</th>
+                <th scope="col">Plain-Language Description</th>
+              </tr>
+            </thead>
+            <tbody id="zion-mapping-tbody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+          <button type="button" id="btn-save-zion-mappings" class="btn-augie-primary">✓ Apply Zion Field Mappings Live</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accessible Visual Toast Banner -->
+    <div id="workbench-toast" class="toast-banner" role="status" aria-live="polite" hidden></div>
+
+    <!-- Scripts -->
+    <script src="./views/personas-data.js"></script>
+    <script src="./views/default-views.js"></script>
+    <script src="./a2ui-renderer.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
