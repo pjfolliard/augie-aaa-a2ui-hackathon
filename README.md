@@ -110,8 +110,10 @@ Every component in this starter kit is built for **blind, deaf, visually impaire
 
 ---
 
-## 🗂️ Hypothetical Schema Notice & Zion Cloud Solutions Adapter
+## 🔌 Zion Cloud Solutions — Jenzabar J1 (`J1PRD`) Connector API v1.0 (26 Endpoints)
 
-All fields currently displayed in the workbench are **hypothetical** (`PENDING_ZION_*`). When **Zion Cloud Solutions** delivers the official field dictionary tonight or tomorrow:
-1. Update [`data/zion_schema_mapping.json`](./data/zion_schema_mapping.json) (or use the **Zion Cloud Solutions Field Mapper** modal inside the web workbench).
-2. Run `python3 scripts/build_data.py && python3 scripts/validate_project.py` to propagate and verify all field mappings across the 10 personas.
+All 10 persona views and 100 question blueprints are mapped to **Zion Cloud Solutions' Academic Advising Agent Connector API Reference v1.0** ([`data/Zion_AAA_Connector_API_Reference.pdf`](./data/Zion_AAA_Connector_API_Reference.pdf) & [`data/zion_schema_mapping.json`](./data/zion_schema_mapping.json)):
+* **Base URL:** `https://connector-api-385429559879.us-central1.run.app` (Cloud Run `us-central1`, project `fit-stream-495320-f6`)
+* **SIS Data Source:** **Jenzabar J1 (`J1PRD`)** over site-to-site VPN (100% live read-only `GET` queries; zero cached student data; never writes directly to J1).
+* **Two-Layer Auth:** `Authorization: Bearer <Google OIDC token>` (`roles/run.invoker`) + `X-User-Id` (`ID_NUM`) & `X-User-Role` (`student`, `advisor`, `advising_admin`) resolved via `GET /identity/resolve?email=...`.
+* **26 Endpoints:** Catalog (6), Identity (2), Student (8), Advisor (9), and Administrator (2), including live degree audit (`GET /students/me/degree-progress?detail=true&checklist=true&rules=true`) for **Sophia Core** (`gen_ed`), major/concentration progress (`programs[]`), `below_c_minus` C- rule checks, and 50% Augustana residency (`degree_rules.residency.meets_50`).

@@ -34,6 +34,25 @@ GEMINI_ENTERPRISE_CATALOG_ID = (
 )
 A2A_EXTENSION_URI = "https://a2ui.org/a2a-extension/a2ui/v0.9"
 
+# Official Zion Clouds Jenzabar J1 (J1PRD) Connector API v1.0 Configuration
+ZION_CONNECTOR_BASE_URL = "https://connector-api-385429559879.us-central1.run.app"
+ZION_CONNECTOR_GCP_PROJECT = "fit-stream-495320-f6"
+ZION_CONNECTOR_ROLES = ("student", "advisor", "advising_admin", "anonymous")
+
+# Maps Augustana's 10 functional personas to the 3 J1 Connector API v1.0 X-User-Role values
+PERSONA_TO_J1_CONNECTOR_ROLE: Dict[str, str] = {
+    "admin": "advising_admin",
+    "provost": "advising_admin",
+    "registrar": "advising_admin",
+    "student_success": "advising_admin",
+    "deans": "advising_admin",
+    "area_chair": "advisor",
+    "program_director": "advisor",
+    "department_chair": "advisor",
+    "advisor": "advisor",
+    "student": "student",
+}
+
 PERSONA_OPTIMAL_LAYOUTS: Dict[str, str] = {
     "admin": "inverted-pyramid",
     "provost": "inverted-pyramid",
@@ -105,8 +124,34 @@ def get_persona_context(persona_id_or_role: str) -> Dict[str, Any]:
 
 
 def get_zion_field_catalog() -> Dict[str, Any]:
-    """Tool: Returns the Hypothetical-to-Zion Cloud Solutions field mapping and higher-ed jargon glossary."""
+    """Tool: Returns the Official Zion Clouds Jenzabar J1 (J1PRD) Connector API v1.0 endpoint & field dictionary."""
     return load_zion_schema()
+
+
+def build_zion_j1_connector_request_spec(
+    persona_id: str,
+    j1_id_num: str,
+    endpoint_path: str,
+    query_params: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    """
+    Tool: Builds the authenticated read-only GET request specification for the Zion Clouds
+    Jenzabar J1 (`J1PRD`) Connector API (`https://connector-api-385429559879.us-central1.run.app`).
+    Enforces both Layer 1 (Google Cloud Run OIDC `roles/run.invoker`) and Layer 2 (`X-User-Id`, `X-User-Role`).
+    """
+    pid = persona_id.strip().lower()
+    j1_role = PERSONA_TO_J1_CONNECTOR_ROLE.get(pid, "student")
+    return {
+        "method": "GET",
+        "url": f"{ZION_CONNECTOR_BASE_URL}{endpoint_path}",
+        "query_params": query_params or {},
+        "headers": {
+            "Authorization": "Bearer <Google-Cloud-Run-OIDC-Identity-Token>",
+            "X-User-Id": str(j1_id_num),
+            "X-User-Role": j1_role,
+        },
+        "read_only_j1prd_guarantee": True,
+    }
 
 
 def build_a2ui_system_instruction(default_persona_id: str = "advisor") -> str:
@@ -151,6 +196,7 @@ try:
             get_persona_context,
             get_zion_field_catalog,
             get_recommended_a2ui_layout,
+            build_zion_j1_connector_request_spec,
             validate_action_with_model_armor,
         ],
     )

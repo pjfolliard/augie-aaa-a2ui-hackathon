@@ -115,8 +115,49 @@ Every A2UI view and ADK agent configuration in this repository follows **Zion Cl
 
 ---
 
-## 6. Zion Cloud Solutions Schema Swap Protocol
+## 6. Zion Cloud Solutions — Jenzabar J1 (`J1PRD`) Connector API Reference v1.0 (26 Endpoints)
 
-All fields in `data/zion_schema_mapping.json` and `docs/views/default-views.js` are tagged with a `zionField` code (e.g., `PENDING_ZION_HOLD_CODE`). When Zion Cloud Solutions delivers the official SIS field dictionary:
-1. Update `zionOfficialField` in `data/zion_schema_mapping.json` (or via the **Zion Cloud Solutions Field Mapper** modal in the UI).
-2. Run `python3 scripts/validate_project.py` to verify all 10 personas, 100 questions, brand contrast ratios, and WCAG 2.2 AAA captions pass.
+Reference PDF: [`data/Zion_AAA_Connector_API_Reference.pdf`](../../../data/Zion_AAA_Connector_API_Reference.pdf) (*Augustana University and Zion Clouds, Version 1.0, 24 September 2026*).
+
+### A. Core Architecture, Authentication & Read-Only Contract
+* **Base URL:** `https://connector-api-385429559879.us-central1.run.app` (Google Cloud Run, `us-central1`, project `fit-stream-495320-f6`)
+* **Data Source:** Live read-only queries over site-to-site VPN against **Jenzabar J1 (`J1PRD`)**. Zero student data is cached or copied.
+* **Read-Only Guarantee:** All **26 endpoints** are `GET` and return JSON. **No endpoint writes to J1** (the API cannot register, drop, or modify records in J1 directly; any `ActionFormCard` or row action in A2UI either triggers an advisory simulation via `/schedule-conflicts` / `/course-eligibility` or initiates an advising workflow handoff).
+* **Two-Layer Authentication (Both Required):**
+  1. **Google Cloud IAM:** `Authorization: Bearer <Google OIDC identity token>` (caller requires `roles/run.invoker`).
+  2. **Identity Headers (derived via `GET /identity/resolve?email=...`):**
+     * `X-User-Id`: User's J1 `ID_NUM` (e.g., `400001`).
+     * `X-User-Role`: `student` (own record only), `advisor` (assigned caseload only; non-owned advisees return `404`), or `advising_admin` (`ACCESS_TYP='M'` in `ADVISING_ACCESS`; institution-wide). Anything else is `anonymous` (catalog & terms only).
+* **Term Key Convention:** Two-part key `yr` (4-digit academic year starting in autumn, so `yr=2026&trm=SP` is **Spring 2027**) and `trm` (`FA`, `SP`, `SU`, `IN`). Always call `GET /terms/resolve?q=...` rather than constructing term keys by hand.
+
+### B. All 26 Official Endpoints & Returned JSON Fields
+1. **Catalog Endpoints (6 — No identity headers required):**
+   * `GET /health` → `status`, `db.server`, `db.database` (`"J1PRD"`), `db.time`
+   * `GET /terms?yr=&limit=` → `count`, `terms[]` (`yr`, `trm`, `term_name`, `label`, `begins`, `ends`)
+   * `GET /terms/resolve?q=` → `interpreted`, `matches[]` (`yr`, `trm`, `term_name`, `label`, `begins`, `ends`)
+   * `GET /catalog/courses?subject=&level=&active_only=true&limit=` → `count`, `courses[]` (`crs_cde`, `title`, `credit_hrs`, `division`, `school`, `active`)
+   * `GET /catalog/sections?yr=&trm=&subject=&level=&open_only=true&min_seats=&limit=` → `count`, `term`, `sections[]` (`yr`, `trm`, `crs_cde`, `request_num`, `title`, `status`, `capacity`, `enrolled`, `seats_left`, `waitlisted`, `credit_hrs`, `instructor_id`, `instructor`, `prerequisites_raw`)
+   * `GET /catalog/section?yr=&trm=&crs=` → `section` (adds `cancelled`, `section_notes`)
+2. **Identity Endpoints (2):**
+   * `GET /identity/resolve?email=` → `id_num`, `role` (`student` | `advisor` | `advising_admin` | `null`)
+   * `GET /me/profile` → `id`, `first_name`, `last_name`, `name`, `display_name`
+3. **Student Endpoints (8 — `X-User-Role: student`, scoped to `X-User-Id`):**
+   * `GET /students/me/registration?yr=&trm=` → `count`, `term`, `registration[]` (`crs_cde`, `title`, `status`, `status_label` [`registered`|`completed`|`dropped`|`withdrawn`], `credit_hrs`, `instructor`, `meetings[]` [`seq`, `days`, `begin`, `end`, `building_code`, `building`, `room`])
+   * `GET /students/me/holds` → `count`, `holds[]` (`hold_cde`, `hold_desc`, `hold_type`, `display_text`, `start_dte`, `end_dte`, `blocks_registration`, `allow_web_reg`)
+   * `GET /students/me/registration-window?yr=&trm=` → `term`, `found`, `count`, `windows[]` (`group_code`, `group_name`, `add_begin`, `add_end`, `drop_begin`, `drop_end`, `add_open_now`, `drop_open_now`, `requires_clearance`, `requires_advisor_approval`)
+   * `GET /students/me/gpa` → `cumulative_gpa`, `institution_gpa`, `transfer_gpa`, `by_area[]` (`area`, `label`, `gpa`)
+   * `GET /students/me/schedule-conflicts?yr=&trm=&candidate=&candidates=` → `term`, `candidate`, `has_conflict`, `conflicts[]`, `current_meetings[]`
+   * `GET /students/me/course-eligibility?yr=&trm=&crs=` → `crs_cde`, `yr`, `trm`, `prerequisites_raw`, `status` (`met`|`not_met`|`verify`), `missing[]`, `note`, `already_completed.taken`, `advisory`
+   * `GET /students/me/recommend-next-term?yr=&trm=` → `available`, `term`, `as_of`, `items[]` (`code`, `title`, `satisfies`, `kind`, `status`, `open`, `seats_left`), `open_requirements[]` (`requirement`, `kind`, `count_needed`, `reason`)
+   * `GET /students/me/degree-progress?detail=true&checklist=true&rules=true` → `declared`, `audit` (`summary`, `gen_ed` [`Sophia Core`, `hrs_earned`, `hrs_needed: 45`], `programs[]`, `total_credits` [`earned`, `needed: 124`, `met`, `requirements_complete`], `overall_gpa`, `checklist`), `plan` (`available: false`, `"AVStudentPlan not populated at AugU"`), `degree_rules` (`min_grade.below_c_minus[]`, `residency.meets_50`, `degree.cum_gpa_ok`, `retake`)
+4. **Advisor & Administrator Endpoints (9 Advisor + 2 Admin = 11):**
+   * `GET /advisors/me/caseload?yr=&trm=&status=unregistered` → `count`, `term`, `status`, `advisees[]` (`advisee_id`, `advisee_name`, `registered_count`, `registered_credits`, `active_holds`)
+   * `GET /advisors/me/advisees/{adviseeId}/...` → 8 routes mirroring `/students/me/...` (`/registration`, `/holds`, `/registration-window`, `/gpa`, `/schedule-conflicts`, `/course-eligibility`, `/recommend-next-term`, `/degree-progress`)
+   * `GET /students/search?q=&limit=` *(Admin only)* → `count`, `query`, `students[]` (`id_num`, `name`)
+   * `GET /advisors/me/caseload?yr=&trm=&scope=all&limit=&offset=` *(Admin only)* → `count`, `term`, `scope: "all"`, `total` (`3424`), `limit`, `offset`, `advisees[]`
+
+### C. Three Easy-to-Misread J1 Degree Audit Fields (Always Enforce in UI & Prompts)
+1. **`credits_met` vs. `incomplete_requirements`:** `credits_met` covers only the credit count. A program can be `met: "not_met"` while `credits_met` is `true`. Always check `incomplete_requirements` before calling a program complete.
+2. **`total_credits.met` vs. `requirements_complete`:** `total_credits.met` only means `earned >= needed` (`124`). If `requirements_complete` is `false`, the degree is **not** finished.
+3. **`plan.available` is always `false`:** J1 holds no forward term-by-term plans (`AVStudentPlan`) at Augustana. Use `/students/me/recommend-next-term` + `/students/me/degree-progress` instead.
+4. **Data Privacy Boundary (`BIOGRAPH_MASTER` Excluded):** Connector API v1.0 does not read `BIOGRAPH_MASTER`, address/telephone tables, or free-text notes. International F-1 12-credit checks evaluate `registered_credits >= 12` from `/registration` or `/caseload`.

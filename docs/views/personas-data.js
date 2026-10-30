@@ -757,55 +757,114 @@ window.AUGIE_AAA_PERSONAS = [
 ];
 
 window.AUGIE_ZION_SCHEMA = {
-  "schemaStatus": "HYPOTHETICAL_PRE_ZION_CLOUD_SOLUTIONS",
+  "schemaStatus": "ZION_J1PRD_CONNECTOR_API_V1_0",
   "partner": "Zion Cloud Solutions",
   "institution": "Augustana University (Sioux Falls, SD)",
-  "lastUpdated": "2026-10-29",
-  "instructionsForTomorrow": "When Zion Cloud Solutions delivers the official SIS/CRM data dictionary, update the `zionOfficialField` and `zionTable` properties below (or paste the CSV/JSON into the Workbench 'Zion Field Mapper' modal) to automatically re-label all 10 persona A2UI tables.",
+  "lastUpdated": "2026-10-30",
+  "connectorApi": {
+    "version": "1.0 (24 September 2026)",
+    "baseUrl": "https://connector-api-385429559879.us-central1.run.app",
+    "protocol": "HTTPS GET-only REST API returning JSON (Read-only; never writes to J1)",
+    "dataSource": "Jenzabar J1 (J1PRD) over site-to-site VPN (Zero cached student data)",
+    "hosting": "Google Cloud Run, us-central1, project fit-stream-495320-f6",
+    "authLayers": [
+      "Layer 1 (Google Cloud IAM): Authorization: Bearer <Google OIDC identity token> (requires roles/run.invoker)",
+      "Layer 2 (Identity Headers): X-User-Id (<J1 ID_NUM>) and X-User-Role (student | advisor | advising_admin; resolved via GET /identity/resolve?email=...)"
+    ],
+    "criticalConventions": [
+      "Terms use yr (4-digit academic year starting in autumn, so yr=2026&trm=SP is Spring 2027) and trm (FA, SP, SU, IN). Always call GET /terms/resolve?q=... first.",
+      "Advisee routes (/advisors/me/advisees/{adviseeId}/...) verify advisor-advisee ownership in J1 and return 404 (not 403) if not owned.",
+      "Degree Audit gotcha 1: credits_met covers only credit count; check incomplete_requirements and met ('not_met') before calling a program complete.",
+      "Degree Audit gotcha 2: total_credits.met means earned >= needed (124), but if requirements_complete is false, the degree is NOT finished.",
+      "Degree Audit gotcha 3: plan.available is always false ('AVStudentPlan not populated at AugU'). Use /students/me/recommend-next-term + /degree-progress instead.",
+      "Privacy boundary: Connector API v1.0 does not read BIOGRAPH_MASTER, address/telephone tables, or free-text notes."
+    ],
+    "endpointCount": 26,
+    "endpointGroups": {
+      "catalog": [
+        "GET /health",
+        "GET /terms?yr=&limit=",
+        "GET /terms/resolve?q=",
+        "GET /catalog/courses?subject=&level=&active_only=true&limit=",
+        "GET /catalog/sections?yr=&trm=&subject=&level=&open_only=true&min_seats=&limit=",
+        "GET /catalog/section?yr=&trm=&crs="
+      ],
+      "identity": [
+        "GET /identity/resolve?email=",
+        "GET /me/profile"
+      ],
+      "student": [
+        "GET /students/me/registration?yr=&trm=",
+        "GET /students/me/holds",
+        "GET /students/me/registration-window?yr=&trm=",
+        "GET /students/me/gpa",
+        "GET /students/me/schedule-conflicts?yr=&trm=&candidate=&candidates=",
+        "GET /students/me/course-eligibility?yr=&trm=&crs=",
+        "GET /students/me/recommend-next-term?yr=&trm=",
+        "GET /students/me/degree-progress?detail=true&checklist=true&rules=true"
+      ],
+      "advisor": [
+        "GET /advisors/me/caseload?yr=&trm=&status=unregistered",
+        "GET /advisors/me/advisees/{adviseeId}/registration?yr=&trm=",
+        "GET /advisors/me/advisees/{adviseeId}/holds",
+        "GET /advisors/me/advisees/{adviseeId}/registration-window?yr=&trm=",
+        "GET /advisors/me/advisees/{adviseeId}/gpa",
+        "GET /advisors/me/advisees/{adviseeId}/schedule-conflicts?yr=&trm=&candidate=",
+        "GET /advisors/me/advisees/{adviseeId}/course-eligibility?yr=&trm=&crs=",
+        "GET /advisors/me/advisees/{adviseeId}/recommend-next-term?yr=&trm=",
+        "GET /advisors/me/advisees/{adviseeId}/degree-progress?detail=true&checklist=true&rules=true"
+      ],
+      "administrator": [
+        "GET /students/search?q=&limit=",
+        "GET /advisors/me/caseload?yr=&trm=&scope=all&limit=&offset="
+      ]
+    }
+  },
+  "instructionsForTomorrow": "Mapped directly to Zion Cloud Solutions' Academic Advising Agent Connector API Reference v1.0 (26 GET endpoints over Jenzabar J1 `J1PRD`). Fields natively returned in v1.0 show their exact endpoint and JSON path; campus metrics requiring Phase 2 J1 queries or aggregation are tagged `[Phase 2 J1 Query]`.",
   "jargonGlossary": {
     "SOPHIA": {
-      "term": "SOPHIA Plan (Core General Education)",
-      "plainLanguage": "Augustana University's general education curriculum required of all undergraduates (Exploring the Liberal Arts).",
+      "term": "SOPHIA Plan (Core General Education — J1 `gen_ed.curriculum: Sophia Core`)",
+      "plainLanguage": "Augustana University's general education curriculum required of all undergraduates (45 credits in J1 `audit.gen_ed.hrs_needed`, `aim_label: CORE`).",
       "i18n": {
-        "es": "Plan SOPHIA (Educación General Básica)",
-        "zh": "SOPHIA 核心通识教育计划",
-        "ne": "SOPHIA सामान्य शिक्षा योजना",
-        "am": "SOPHIA አጠቃላይ ትምህርት ዕቅድ"
+        "es": "Plan SOPHIA (Educación General Básica — 45 créditos)",
+        "zh": "SOPHIA 核心通识教育计划（45学分）",
+        "ne": "SOPHIA सामान्य शिक्षा योजना (४५ क्रेडिट)",
+        "am": "SOPHIA አጠቃላይ ትምህርት ዕቅድ (45 ክሬዲት)"
       }
     },
     "DFW Rate": {
-      "term": "DFW Rate (Drop / Fail / Withdraw %)",
-      "plainLanguage": "Percentage of enrolled students who earn a D, earn an F, or withdraw (W) from a course rather than completing it with C- or better.",
+      "term": "DFW Rate (Drop / Fail / Withdraw % & J1 `below_c_minus`)",
+      "plainLanguage": "Percentage of enrolled students who earn a D, earn an F, or withdraw (W). In J1 `degree_rules.min_grade`, major courses require C- or better (`below_c_minus` triggers `retake_to_count`).",
       "i18n": {
-        "es": "Tasa DFW (% de Baja, Reprobación o Retiro)",
-        "zh": "DFW 率（低分/不及格/退课比例）",
-        "ne": "DFW दर (ड्रप / फेल / फिर्ता प्रतिशत)",
+        "es": "Tasa DFW (% de Baja, Reprobación o Retiro; mínimo C- en la especialidad)",
+        "zh": "DFW 率（低分/不及格/退课比例；专业课要求 C- 及以上）",
+        "ne": "DFW दर (ड्रप / फेल / फिर्ता प्रतिशत; प्रमुख विषयमा कम्तीमा C- आवश्यक)",
         "am": "DFW ምጣኔ (ያቋረጡ/የወደቁ ተማሪዎች መቶኛ)"
       }
     },
     "SAP": {
-      "term": "SAP (Satisfactory Academic Progress)",
-      "plainLanguage": "Federal and institutional requirement (minimum GPA and credit completion pace) needed to keep financial aid and scholarships.",
+      "term": "SAP & Minimum Degree GPA (J1 `degree_rules.degree.min_cum_gpa: 2.0`)",
+      "plainLanguage": "Federal and institutional requirement (`cum_gpa >= 2.0` in J1 `degree_rules.degree.cum_gpa_ok` plus credit completion pace) needed to maintain good standing and financial aid.",
       "i18n": {
-        "es": "Progreso Académico Satisfactorio (Requisito de Ayuda Financiera)",
-        "zh": "学业进展合格标准（维持奖助学金要求）",
-        "ne": "सन्तोषजनक शैक्षिक प्रगति (छात्रवृत्ति कायम राख्ने नियम)",
+        "es": "Progreso Académico Satisfactorio (Promedio mínimo 2.0 y ritmo de créditos)",
+        "zh": "学业进展合格标准（累计 GPA 至少 2.0 及学分完成进度）",
+        "ne": "सन्तोषजनक शैक्षिक प्रगति (न्युनतम २.० GPA र क्रेडिट प्रगति)",
         "am": "አጥጋቢ የትምህርት እድገት (የገንዘብ ድጋፍ መስፈርት)"
       }
     },
     "Hold": {
-      "term": "Registration Hold",
-      "plainLanguage": "A block on your account (such as an unpaid balance, missing immunization form, or required advisor check-in) that must be cleared before you can register for classes.",
+      "term": "Registration Hold (J1 `/students/me/holds` → `blocks_registration: H`)",
+      "plainLanguage": "A restriction on your J1 account (`hold_cde`, `hold_desc`, `hold_type`) that blocks course registration (`blocks_registration: 'H'`) until cleared by the issuing office.",
       "i18n": {
-        "es": "Retención de Matrícula (Bloqueo temporal para inscribir clases)",
-        "zh": "选课限制/冻结（需先解除才能选课）",
+        "es": "Retención de Matrícula (Bloqueo temporal para inscribir clases en J1)",
+        "zh": "选课限制/冻结（J1 系统中阻止选课的账户限制）",
         "ne": "दर्ता रोक्का (कक्षा दर्ता गर्नुअघि हटाउनुपर्ने अवरोध)",
         "am": "የምዝገባ እገዳ (ኮርስ ከመመዝገብዎ በፊት መፈታት ያለበት)"
       }
     },
     "F-1 Full-Time Load": {
-      "term": "F-1 International Full-Time Enrollment (12+ Credits)",
-      "plainLanguage": "US SEVIS immigration rule requiring F-1 international undergraduate students to stay enrolled in at least 12 credits each fall/spring semester unless authorized by the International Programs Office (IPO).",
+      "term": "F-1 International Full-Time Enrollment (12+ Credits in `registered_credits`)",
+      "plainLanguage": "US SEVIS immigration rule requiring F-1 international undergraduate students to stay enrolled in at least 12 credits (`registered_credits >= 12`) each fall/spring semester unless authorized by the International Programs Office (IPO).",
       "i18n": {
         "es": "Carga Completa F-1 (Mínimo 12 créditos para visa internacional)",
         "zh": "F-1 国际学生全职学分要求（每学期至少 12 学分）",
@@ -814,152 +873,188 @@ window.AUGIE_ZION_SCHEMA = {
       }
     },
     "Prerequisite Override": {
-      "term": "Prerequisite Override",
-      "plainLanguage": "Official permission from a faculty member or department chair allowing a student to enroll in a class without having completed the standard prior course.",
+      "term": "Course Eligibility & Prerequisite Check (J1 `/course-eligibility` & `department_override`)",
+      "plainLanguage": "J1's `/students/me/course-eligibility` checks whether prior courses are `met`, `not_met`, or `verify` (`missing[]`). Official permission from a department chair grants a prerequisite or `department_override`.",
       "i18n": {
-        "es": "Exención de Prerrequisito (Permiso especial para inscribir un curso)",
-        "zh": "先修课豁免许可（系主任/教师特批选课）",
-        "ne": "पूर्वशर्त छुट अनुमति (विशेष अनुमतिले कक्षा लिने)",
+        "es": "Elegibilidad y Exención de Prerrequisito (Verificación en J1)",
+        "zh": "课程先修资格检查与豁免许可（J1 资格验证）",
+        "ne": "पूर्वशर्त योग्यता र छुट अनुमति",
         "am": "የቅድመ-ሁኔታ ይሁንታ (ያለ ቅድመ ኮርስ ለመመዝገብ የሚሰጥ ፈቃድ)"
       }
     },
     "Residency Requirement": {
-      "term": "Institutional Residency Credit Requirement",
-      "plainLanguage": "The minimum number of credit hours (particularly upper-level credits) that must be taken directly at Augustana University rather than transferred from another college.",
+      "term": "Institutional Residency Requirement (J1 `degree_rules.residency.meets_50`)",
+      "plainLanguage": "Tracked in J1 `degree_rules.residency` (`major_courses_total`, `at_augustana`, `transfer`, `pct_at_augustana`, `meets_50`): at least 50% of major courses must be taken directly at Augustana University.",
       "i18n": {
-        "es": "Requisito de Créditos en Residencia (Créditos cursados en Augustana)",
-        "zh": "本校修读学分要求（必须在奥古斯塔纳大学修满的学分）",
-        "ne": "संस्थागत रेसिडेन्सी क्रेडिट (अगस्टानामा नै पढ्नुपर्ने क्रेडिट)",
-        "am": "በዩኒቨርሲቲው ውስጥ መወሰድ ያለባቸው ክሬዲቶች"
+        "es": "Requisito de Residencia en Augustana (Mínimo 50% de cursos de la especialidad en Augustana)",
+        "zh": "本校修读学分要求（至少 50% 专业课须在奥古斯塔纳大学修读）",
+        "ne": "संस्थागत रेसिडेन्सी नियम (कम्तीमा ५०% प्रमुख विषय अगस्टानामा पढ्नुपर्ने)",
+        "am": "በዩኒቨርሲቲው ውስጥ መወሰድ ያለባቸው ክሬዲቶች (ቢያንስ 50%)"
       }
     }
   },
   "fields": [
     {
       "hypotheticalField": "student_id",
-      "zionOfficialField": "PENDING_ZION_STU_ID",
-      "zionTable": "PENDING_ZION_STUDENT_MASTER",
-      "label": "Student ID",
+      "zionOfficialField": "id_num / advisee_id",
+      "zionTable": "GET /identity/resolve | GET /advisors/me/caseload (J1 ID_NUM)",
+      "label": "J1 Student ID (ID_NUM)",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Unique Augustana University student identifier."
+      "plainLanguageDescription": "Jenzabar J1 unique student identifier (`id_num` / `advisee_id`, passed in `X-User-Id` or `/advisors/me/advisees/{adviseeId}`)."
     },
     {
       "hypotheticalField": "student_name",
-      "zionOfficialField": "PENDING_ZION_FULL_NAME",
-      "zionTable": "PENDING_ZION_STUDENT_MASTER",
+      "zionOfficialField": "name / display_name / advisee_name",
+      "zionTable": "GET /me/profile | GET /advisors/me/caseload | GET /students/search",
       "label": "Student Name",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Student's preferred display name and pronouns."
+      "plainLanguageDescription": "Student's display name (`first_name`, `last_name`, `name`, `display_name`, or `advisee_name`)."
     },
     {
       "hypotheticalField": "academic_unit",
-      "zionOfficialField": "PENDING_ZION_COLLEGE_CODE",
-      "zionTable": "PENDING_ZION_ACADEMIC_PROGRAMS",
-      "label": "School / Divisional Area",
+      "zionOfficialField": "courses[].school / courses[].division",
+      "zionTable": "GET /catalog/courses (e.g., school='CAS', division='UG')",
+      "label": "School / Division",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Augustana School, College, or Arts & Sciences Divisional Area."
+      "plainLanguageDescription": "Augustana School or Division code in J1 course catalog (`school`, `division`)."
     },
     {
       "hypotheticalField": "department",
-      "zionOfficialField": "PENDING_ZION_DEPT_CODE",
-      "zionTable": "PENDING_ZION_ACADEMIC_PROGRAMS",
-      "label": "Department",
+      "zionOfficialField": "subject / degree_rules.department_override",
+      "zionTable": "GET /catalog/courses?subject= | GET /students/me/degree-progress?rules=true",
+      "label": "Subject / Department Code",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Home academic department at Augustana University."
+      "plainLanguageDescription": "Academic department / subject prefix (e.g., `BIOL`, `AMSL`, `COSC`, `MUSI`)."
     },
     {
       "hypotheticalField": "major_program",
-      "zionOfficialField": "PENDING_ZION_MAJOR_CIP_CODE",
-      "zionTable": "PENDING_ZION_ACADEMIC_PROGRAMS",
-      "label": "Declared Major / Program",
+      "zionOfficialField": "declared.major / declared.concentration / audit.programs[].code",
+      "zionTable": "GET /students/me/degree-progress (declared + audit.programs[])",
+      "label": "Declared Major / Concentration",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Primary undergraduate or graduate degree program."
+      "plainLanguageDescription": "Declared J1 degree (`degree_code`), `major`, `major_2`, `concentration`, `catalog_year`, and `expected_grad_year`."
     },
     {
       "hypotheticalField": "assigned_advisor",
-      "zionOfficialField": "PENDING_ZION_ADVISOR_ID",
-      "zionTable": "PENDING_ZION_ADVISING_ROSTER",
-      "label": "Primary Faculty / Success Advisor",
+      "zionOfficialField": "X-User-Id (advisor) / ADVISING_ACCESS [Ownership Checked in J1]",
+      "zionTable": "GET /advisors/me/caseload (J1 advisor-advisee relationship check)",
+      "label": "Assigned J1 Advisor & Ownership",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Assigned Augustana mentor who guides course planning and degree progress."
+      "plainLanguageDescription": "Verified in J1 before reading `/advisors/me/advisees/{adviseeId}/...`; returns 404 if advisor does not own advisee."
     },
     {
       "hypotheticalField": "credits_completed",
-      "zionOfficialField": "PENDING_ZION_EARNED_CREDITS",
-      "zionTable": "PENDING_ZION_DEGREE_AUDIT",
-      "label": "Earned Credits (of 124)",
+      "zionOfficialField": "audit.total_credits.earned / audit.total_credits.needed (124)",
+      "zionTable": "GET /students/me/degree-progress (audit.total_credits)",
+      "label": "Earned Credits (of 124) & requirements_complete",
       "dataType": "number",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Total credit hours earned toward the 124-credit Augustana bachelor's degree."
+      "plainLanguageDescription": "J1 `audit.total_credits.earned` vs `needed` (124). Note: Check `requirements_complete` (not just `total_credits.met`) to confirm degree completion."
     },
     {
       "hypotheticalField": "current_term_credits",
-      "zionOfficialField": "PENDING_ZION_TERM_ENROLLED_CREDITS",
-      "zionTable": "PENDING_ZION_ENROLLMENT_TERM",
-      "label": "Current Term Credits",
+      "zionOfficialField": "advisees[].registered_credits / registration[].credit_hrs",
+      "zionTable": "GET /advisors/me/caseload | GET /students/me/registration?yr=&trm=",
+      "label": "Registered Term Credits & Count",
       "dataType": "number",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Credits enrolled this semester (12+ required for full-time aid & F-1 international status)."
+      "plainLanguageDescription": "Current term enrolled credits (`registered_credits` and `registered_count`; 12+ required for full-time & F-1 status)."
     },
     {
       "hypotheticalField": "sophia_gen_ed_status",
-      "zionOfficialField": "PENDING_ZION_CORE_AUDIT_STATUS",
-      "zionTable": "PENDING_ZION_DEGREE_AUDIT",
-      "label": "SOPHIA Gen-Ed Fulfillment",
+      "zionOfficialField": "audit.gen_ed.met / audit.gen_ed.hrs_earned / hrs_needed (45)",
+      "zionTable": "GET /students/me/degree-progress (audit.gen_ed curriculum='Sophia Core')",
+      "label": "Sophia Core Gen-Ed Status (aim_label='CORE')",
       "dataType": "badge",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Progress on Augustana's SOPHIA Core general education categories."
+      "plainLanguageDescription": "J1 `audit.gen_ed` tracking `curriculum: 'Sophia Core'`, `met` (`met` | `not_met`), `hrs_earned`, and `hrs_needed` (45)."
     },
     {
       "hypotheticalField": "registration_holds",
-      "zionOfficialField": "PENDING_ZION_HOLD_CODES",
-      "zionTable": "PENDING_ZION_STUDENT_HOLDS",
-      "label": "Active Holds",
+      "zionOfficialField": "holds[].hold_cde / hold_desc / blocks_registration / active_holds",
+      "zionTable": "GET /students/me/holds | GET /advisors/me/caseload",
+      "label": "Active J1 Holds (hold_cde & blocks_registration)",
       "dataType": "badge",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Account flags (Advising, Financial, Immunization) that block course registration."
+      "plainLanguageDescription": "J1 holds array (`hold_cde`, `hold_desc`, `hold_type`, `display_text`, `blocks_registration: 'H'`, `allow_web_reg`) and caseload `active_holds` count."
     },
     {
       "hypotheticalField": "academic_standing",
-      "zionOfficialField": "PENDING_ZION_ACAD_STANDING",
-      "zionTable": "PENDING_ZION_DEGREE_AUDIT",
-      "label": "Academic Standing & SAP",
+      "zionOfficialField": "cumulative_gpa / institution_gpa / degree_rules.degree.cum_gpa_ok",
+      "zionTable": "GET /students/me/gpa | GET /students/me/degree-progress?rules=true",
+      "label": "Cumulative & Area GPA (min_cum_gpa: 2.0)",
       "dataType": "badge",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Good Standing, Academic Warning, or Probation + Financial Aid Satisfactory Academic Progress."
+      "plainLanguageDescription": "J1 `cumulative_gpa`, `institution_gpa`, `transfer_gpa`, `by_area[].gpa`, and `degree_rules.degree.cum_gpa_ok` (`min_cum_gpa: 2.0`)."
     },
     {
       "hypotheticalField": "early_warning_flags",
-      "zionOfficialField": "PENDING_ZION_ALERT_COUNT",
-      "zionTable": "PENDING_ZION_STUDENT_ALERTS",
-      "label": "Early Warning Indicators",
+      "zionOfficialField": "degree_rules.min_grade.below_c_minus[] / retake.repeated_courses",
+      "zionTable": "GET /students/me/degree-progress?rules=true (degree_rules.min_grade & retake)",
+      "label": "Major Courses Below C- & Retake Flags",
       "dataType": "badge",
-      "minRbacLevel": 30,
-      "plainLanguageDescription": "Attendance, midterm grade < C, or LMS engagement alerts raised by faculty."
+      "minRbacLevel": 10,
+      "plainLanguageDescription": "J1 `degree_rules.min_grade.below_c_minus[]` (`course`, `grade`, `action: 'retake_to_count'`) and `retake` policy (`university` vs `nursing` caps)."
+    },
+    {
+      "hypotheticalField": "course_eligibility_prereq",
+      "zionOfficialField": "status ('met'|'not_met'|'verify') / missing[] / prerequisites_raw",
+      "zionTable": "GET /students/me/course-eligibility?yr=&trm=&crs=",
+      "label": "Advisory Prerequisite Eligibility",
+      "dataType": "badge",
+      "minRbacLevel": 10,
+      "plainLanguageDescription": "J1 advisory prerequisite check returning `status` (`met`, `not_met`, `verify`), `missing[]`, and `already_completed.taken`."
+    },
+    {
+      "hypotheticalField": "section_seats_capacity",
+      "zionOfficialField": "sections[].capacity / enrolled / seats_left / waitlisted / status",
+      "zionTable": "GET /catalog/sections?yr=&trm= | GET /catalog/section?yr=&trm=&crs=",
+      "label": "Section Seat Capacity & Waitlist",
+      "dataType": "badge",
+      "minRbacLevel": 10,
+      "plainLanguageDescription": "Live J1 section enrollment (`capacity`, `enrolled`, `seats_left`, `waitlisted`, `credit_hrs`, `instructor`, `status`)."
+    },
+    {
+      "hypotheticalField": "registration_window_status",
+      "zionOfficialField": "windows[].group_name / add_open_now / drop_open_now / requires_clearance",
+      "zionTable": "GET /students/me/registration-window?yr=&trm=",
+      "label": "Registration Window & Clearance Flags",
+      "dataType": "badge",
+      "minRbacLevel": 10,
+      "plainLanguageDescription": "J1 registration group (`group_code`, `group_name`), `add_begin`/`add_end`, `add_open_now`, `requires_clearance`, and `requires_advisor_approval`."
+    },
+    {
+      "hypotheticalField": "residency_rule_status",
+      "zionOfficialField": "degree_rules.residency.meets_50 / at_augustana / pct_at_augustana",
+      "zionTable": "GET /students/me/degree-progress?rules=true (degree_rules.residency)",
+      "label": "Augustana 50% Major Residency Check",
+      "dataType": "badge",
+      "minRbacLevel": 10,
+      "plainLanguageDescription": "Tracks `major_courses_total`, `at_augustana`, `transfer`, `pct_at_augustana`, and `meets_50` boolean."
     },
     {
       "hypotheticalField": "visa_international_status",
-      "zionOfficialField": "PENDING_ZION_VISA_SEVIS_FLAG",
-      "zionTable": "PENDING_ZION_INTERNATIONAL",
-      "label": "International / F-1 Credit Guardrail",
+      "zionOfficialField": "registered_credits >= 12 + [Phase 2 J1 BIOGRAPH/SEVIS Flag]",
+      "zionTable": "GET /students/me/registration (credit_hrs sum) + Phase 2 SEVIS Flag",
+      "label": "International / F-1 12-Credit Guardrail",
       "dataType": "badge",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Monitors 12-credit SEVIS full-time requirement and reduced course load (RCL) authorization."
+      "plainLanguageDescription": "Computes live credit load from `/students/me/registration` (`registered_credits >= 12`); note Connector v1.0 does not read `BIOGRAPH_MASTER`."
     },
     {
       "hypotheticalField": "accessibility_accommodations",
-      "zionOfficialField": "PENDING_ZION_ADA_PREF_FORMAT",
-      "zionTable": "PENDING_ZION_STUDENT_SUPPORT",
+      "zionOfficialField": "UI Client Preference + [Phase 2 Student Support Flag]",
+      "zionTable": "A2UI Client Preferences (BIOGRAPH_MASTER / free-text notes excluded in v1.0)",
       "label": "Accessibility & Modality Prefs",
       "dataType": "string",
       "minRbacLevel": 10,
-      "plainLanguageDescription": "Screen-reader compatibility, ASL/captioning, Braille/large-print materials, or testing accommodations."
+      "plainLanguageDescription": "Screen-reader compatibility, ASL/captioning, high-contrast AAA, and multilingual glossary preferences."
     }
   ]
 };

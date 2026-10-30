@@ -21,7 +21,7 @@
         sortKey: "retention_rate",
         sortDir: "desc",
         priorityCols: ["unit_name", "retention_rate", " systemic_holds", "sap_compliance", "advisor_ratio"],
-        extraCol: { key: "yoy_retention_delta", label: "YoY Retention Trend", zionField: "PENDING_ZION_RET_DELTA", type: "badge", values: ["✓ ▲ +1.8% YoY", "⚠ ▼ -0.4% YoY", "✓ ▲ +2.1% YoY", "✓ ▲ +1.5% YoY", "⚠ ▼ -0.8% YoY", "✓ ▲ +1.1% YoY"] }
+        extraCol: { key: "yoy_retention_delta", label: "YoY Retention Trend", zionField: "J1 [Phase 2]: Year-over-Year Persistence", type: "badge", values: ["✓ ▲ +1.8% YoY", "⚠ ▼ -0.4% YoY", "✓ ▲ +2.1% YoY", "✓ ▲ +1.5% YoY", "⚠ ▼ -0.8% YoY", "✓ ▲ +1.1% YoY"] }
       },
       2: {
         layout: "table-first",
@@ -33,7 +33,7 @@
         sortKey: "unassigned_advisees",
         sortDir: "desc",
         priorityCols: ["unit_name", "unassigned_advisees", "advisor_ratio", "systemic_holds", "retention_rate"],
-        extraCol: { key: "assignment_sla", label: "Chair Routing Status", zionField: "PENDING_ZION_ASSIGN_SLA", type: "badge", values: ["⛔ 18 Pending (>48h)", "⛔ 14 Pending (>48h)", "✓ 2 Routed Today", "✓ 3 Routed Today", "⚠ 5 Pending Chair", "✓ 0 Unassigned"] }
+        extraCol: { key: "assignment_sla", label: "Chair Routing Status", zionField: "J1: /advisors/me/caseload?scope=all", type: "badge", values: ["⛔ 18 Pending (>48h)", "⛔ 14 Pending (>48h)", "✓ 2 Routed Today", "✓ 3 Routed Today", "⚠ 5 Pending Chair", "✓ 0 Unassigned"] }
       },
       3: {
         layout: "table-first",
@@ -45,7 +45,7 @@
         sortKey: "portal_checks_30d",
         sortDir: "desc",
         priorityCols: ["unit_name", "portal_checks_30d", "advisor_ratio", "unassigned_advisees", "retention_rate"],
-        extraCol: { key: "active_faculty_pct", label: "Faculty Portal Login %", zionField: "PENDING_ZION_PORTAL_PCT", type: "badge", values: ["✓ 98% Active", "✓ 96% Active", "✓ 100% Active", "✓ 97% Active", "⚠ 89% Active", "✓ 95% Active"] }
+        extraCol: { key: "active_faculty_pct", label: "Faculty Portal Login %", zionField: "J1: caseload?status=unregistered", type: "badge", values: ["✓ 98% Active", "✓ 96% Active", "✓ 100% Active", "✓ 97% Active", "⚠ 89% Active", "✓ 95% Active"] }
       },
       4: {
         layout: "inverted-pyramid",
@@ -57,7 +57,7 @@
         sortKey: "portal_checks_30d",
         sortDir: "desc",
         priorityCols: ["unit_name", "portal_checks_30d", "retention_rate", "sap_compliance"],
-        extraCol: { key: "auto_vs_manual", label: "ADK Auto-Audits vs. Manual", zionField: "PENDING_ZION_AUDIT_SPLIT", type: "string", values: ["340 ADK / 72 Manual", "290 ADK / 66 Manual", "155 ADK / 34 Manual", "180 ADK / 34 Manual", "112 ADK / 32 Manual", "88 ADK / 17 Manual"] }
+        extraCol: { key: "auto_vs_manual", label: "ADK Auto-Audits vs. Manual", zionField: "J1: audit.gen_ed + audit.programs[]", type: "string", values: ["340 ADK / 72 Manual", "290 ADK / 66 Manual", "155 ADK / 34 Manual", "180 ADK / 34 Manual", "112 ADK / 32 Manual", "88 ADK / 17 Manual"] }
       },
       5: {
         layout: "table-first",
@@ -69,7 +69,7 @@
         sortKey: "advisor_ratio",
         sortDir: "desc",
         priorityCols: ["unit_name", "advisor_ratio", "unassigned_advisees", "retention_rate"],
-        extraCol: { key: "ratio_target_status", label: "1:20 Target Benchmark", zionField: "PENDING_ZION_RATIO_BENCH", type: "badge", values: ["⚠ Above 1:20 Target", "✓ Within Target", "✓ Optimal Load", "✓ Within Target", "✓ Optimal Load", "⚠ Above 1:20 Target"] }
+        extraCol: { key: "ratio_target_status", label: "1:20 Target Benchmark", zionField: "J1: caseload.count", type: "badge", values: ["⚠ Above 1:20 Target", "✓ Within Target", "✓ Optimal Load", "✓ Within Target", "✓ Optimal Load", "⚠ Above 1:20 Target"] }
       },
       6: {
         layout: "split-dashboard",
@@ -81,7 +81,7 @@
         sortKey: "systemic_holds",
         sortDir: "desc",
         priorityCols: ["unit_name", "systemic_holds", "sap_compliance", "unassigned_advisees"],
-        extraCol: { key: "f1_sevis_holds", label: "F-1 International Check", zionField: "PENDING_ZION_F1_UNIT_CNT", type: "badge", jargon: "F-1 Full-Time Load", values: ["🌐 6 F-1 Watch", "🌐 4 F-1 Watch", "✓ 0 F-1 Holds", "✓ 1 F-1 Verified", "✓ 2 F-1 Verified", "🌐 3 F-1 Watch"] }
+        extraCol: { key: "f1_sevis_holds", label: "F-1 International Check", zionField: "J1: registered_credits + [Phase 2 SEVIS]", type: "badge", jargon: "F-1 Full-Time Load", values: ["🌐 6 F-1 Watch", "🌐 4 F-1 Watch", "✓ 0 F-1 Holds", "✓ 1 F-1 Verified", "✓ 2 F-1 Verified", "🌐 3 F-1 Watch"] }
       },
       7: {
         layout: "inverted-pyramid",
@@ -93,7 +93,7 @@
         sortKey: "portal_checks_30d",
         sortDir: "desc",
         priorityCols: ["unit_name", "portal_checks_30d", "advisor_ratio", "systemic_holds"],
-        extraCol: { key: "live_active_users", label: "Live Active Sessions Now", zionField: "PENDING_ZION_LIVE_USERS", type: "badge", values: ["✓ 94 Online Now", "✓ 82 Online Now", "✓ 38 Online Now", "✓ 46 Online Now", "✓ 34 Online Now", "✓ 24 Online Now"] }
+        extraCol: { key: "live_active_users", label: "Live Active Sessions Now", zionField: "J1: /health + Cloud Run Metrics", type: "badge", values: ["✓ 94 Online Now", "✓ 82 Online Now", "✓ 38 Online Now", "✓ 46 Online Now", "✓ 34 Online Now", "✓ 24 Online Now"] }
       },
       8: {
         layout: "table-first",
@@ -105,7 +105,7 @@
         sortKey: "unassigned_advisees",
         sortDir: "desc",
         priorityCols: ["unit_name", "unassigned_advisees", "advisor_ratio", "retention_rate"],
-        extraCol: { key: "major_change_rate", label: "Major Switch Rate (YTD)", zionField: "PENDING_ZION_MAJOR_CHG_PCT", type: "badge", values: ["⚠ 9.4% (38 Switches)", "⚠ 10.2% (34 Switches)", "✓ 3.1% (6 Switches)", "✓ 4.8% (12 Switches)", "⚠ 8.5% (19 Switches)", "✓ 2.9% (9 Switches)"] }
+        extraCol: { key: "major_change_rate", label: "Major Switch Rate (YTD)", zionField: "J1: declared.major vs catalog_year", type: "badge", values: ["⚠ 9.4% (38 Switches)", "⚠ 10.2% (34 Switches)", "✓ 3.1% (6 Switches)", "✓ 4.8% (12 Switches)", "⚠ 8.5% (19 Switches)", "✓ 2.9% (9 Switches)"] }
       },
       9: {
         layout: "inverted-pyramid",
@@ -117,7 +117,7 @@
         sortKey: "retention_rate",
         sortDir: "desc",
         priorityCols: ["unit_name", "retention_rate", "sap_compliance", "portal_checks_30d"],
-        extraCol: { key: "course_completion_pct", label: "Course Completion %", zionField: "PENDING_ZION_COMPLETION_PCT", type: "badge", values: ["✓ 92.4% Completed", "✓ 93.1% Completed", "✓ 96.8% Completed", "✓ 95.9% Completed", "✓ 93.5% Completed", "✓ 95.2% Completed"] }
+        extraCol: { key: "course_completion_pct", label: "Course Completion %", zionField: "J1: registration[].status_label=completed", type: "badge", values: ["✓ 92.4% Completed", "✓ 93.1% Completed", "✓ 96.8% Completed", "✓ 95.9% Completed", "✓ 93.5% Completed", "✓ 95.2% Completed"] }
       },
       10: {
         layout: "split-dashboard",
@@ -129,7 +129,7 @@
         sortKey: "sap_compliance",
         sortDir: "asc",
         priorityCols: ["unit_name", "sap_compliance", "systemic_holds", "retention_rate"],
-        extraCol: { key: "sap_export_ready", label: "Federal Export Package", zionField: "PENDING_ZION_SAP_EXPORT", type: "badge", jargon: "SAP", values: ["✓ Ready (CSV/JSON)", "⚠ 19 Plans Pending", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)"] }
+        extraCol: { key: "sap_export_ready", label: "Federal Export Package", zionField: "J1: /gpa + degree_rules.degree.cum_gpa_ok", type: "badge", jargon: "SAP", values: ["✓ Ready (CSV/JSON)", "⚠ 19 Plans Pending", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)"] }
       }
     }
   };
@@ -176,7 +176,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: "Drop & F-1 12-Cr Impact",
-        zionField: "PENDING_ZION_DROP_F1_CHECK",
+        zionField: "J1: registered_credits - credit_hrs >= 12",
         type: "badge",
         jargon: "F-1 Full-Time Load",
         values: [
@@ -192,7 +192,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: `Q${qNum} Hold & Reg Clearance`,
-        zionField: "PENDING_ZION_REG_CLEARANCE",
+        zionField: "J1: registration-window.requires_clearance",
         type: "badge",
         jargon: "Hold",
         values: [
@@ -208,7 +208,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: `Q${qNum} Override / Equivalency Status`,
-        zionField: "PENDING_ZION_OVERRIDE_WORKFLOW",
+        zionField: "J1: /course-eligibility + department_override",
         type: "badge",
         jargon: "Prerequisite Override",
         values: [
@@ -224,7 +224,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: `Q${qNum} SOPHIA & Residency Check`,
-        zionField: "PENDING_ZION_SOPHIA_RES_AUDIT",
+        zionField: "J1: audit.gen_ed.met + residency.meets_50",
         type: "badge",
         jargon: "SOPHIA",
         values: [
@@ -240,7 +240,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: `Q${qNum} Early-Alert & DFW Triage`,
-        zionField: "PENDING_ZION_EARLY_ALERT_TRIAGE",
+        zionField: "J1: degree_rules.min_grade.below_c_minus[]",
         type: "badge",
         jargon: "DFW Rate",
         values: [
@@ -256,7 +256,7 @@
       extraCol = {
         key: `q${qNum}_focus`,
         label: `Q${qNum} Advising Load & Booking`,
-        zionField: "PENDING_ZION_ADVISOR_CAPACITY",
+        zionField: "J1: /advisors/me/caseload.count",
         type: "badge",
         values: [
           "✓ Calendar Open (Tue/Thu)",

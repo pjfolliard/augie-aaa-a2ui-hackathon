@@ -62,19 +62,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "University-Wide Academic Unit Advising & Compliance Audit [Hypothetical Pre-Zion Fields]",
+              title: "University-Wide Academic Unit Advising & Compliance Audit [Zion J1PRD Connector API v1.0]",
               a11yCaption: "University-wide audit table comparing academic units by retention rate, unassigned advisees, advisor-to-student ratio, active holds, and SAP compliance.",
               a11ySummary: "Use arrow keys or Tab to navigate columns. Click any column header or press Enter to sort. Status cells include both icons and text labels for screen readers and color-blind accessibility.",
               rowHeaderKey: "unit_name",
               rowsPath: "/unitAuditRows",
               columns: [
-                { key: "unit_name", label: "Academic Unit / Area", zionField: "PENDING_ZION_COLLEGE_CODE", sortable: true },
-                { key: "retention_rate", label: "Retention Rate (Yr 1→2)", zionField: "PENDING_ZION_RETENTION_PCT", sortable: true },
-                { key: "unassigned_advisees", label: "Unassigned Advisees", zionField: "PENDING_ZION_UNASSIGNED_CNT", sortable: true },
-                { key: "advisor_ratio", label: "Advisor : Student Ratio", zionField: "PENDING_ZION_ADV_RATIO", sortable: true },
-                { key: "systemic_holds", label: "Active Registration Holds", zionField: "PENDING_ZION_HOLD_CNT", type: "badge", jargon: "Hold", sortable: true },
-                { key: "sap_compliance", label: "Financial Aid SAP Status", zionField: "PENDING_ZION_SAP_RATE", type: "badge", jargon: "SAP", sortable: true },
-                { key: "portal_checks_30d", label: "Degree Checks (30d)", zionField: "PENDING_ZION_AUDIT_RUNS", sortable: true }
+                { key: "unit_name", label: "Academic Unit / Area", zionField: "J1: courses[].school", sortable: true },
+                { key: "retention_rate", label: "Retention Rate (Yr 1→2)", zionField: "J1 [Phase 2]: Cohort Retention Rollup", sortable: true },
+                { key: "unassigned_advisees", label: "Unassigned Advisees", zionField: "J1 [Phase 2]: Unassigned ID_NUM Count", sortable: true },
+                { key: "advisor_ratio", label: "Advisor : Student Ratio", zionField: "J1: caseload?scope=all.total", sortable: true },
+                { key: "systemic_holds", label: "Active Registration Holds", zionField: "J1: advisees[].active_holds", type: "badge", jargon: "Hold", sortable: true },
+                { key: "sap_compliance", label: "Financial Aid SAP Status", zionField: "J1: degree_rules.degree.cum_gpa_ok", type: "badge", jargon: "SAP", sortable: true },
+                { key: "portal_checks_30d", label: "Degree Checks (30d)", zionField: "J1: audit.as_of (live J1PRD query)", sortable: true }
               ],
               rowActions: [
                 { id: "audit-unit", label: "Inspect Unit Roster", icon: "🔍" },
@@ -171,19 +171,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Academic Division Outcomes, Advising Load & Seat Bottleneck Matrix [Hypothetical Pre-Zion Fields]",
+              title: "Academic Division Outcomes, Advising Load & Seat Bottleneck Matrix [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Provost comparison table of Augustana academic divisions showing 4-year graduation rate, 3-year enrollment trend, SOPHIA fulfillment, probation rate, and critical seat shortages.",
               a11ySummary: "Compares academic divisions across graduation, enrollment trend, advising load, and seat shortages.",
               rowHeaderKey: "division",
               rowsPath: "/divisionRows",
               columns: [
-                { key: "division", label: "Academic Division / School", zionField: "PENDING_ZION_DIVISION", sortable: true },
-                { key: "grad_rate_4yr", label: "4-Yr Graduation Rate", zionField: "PENDING_ZION_GRAD_4YR", sortable: true },
-                { key: "trend_3yr", label: "3-Yr Enrollment Trend", zionField: "PENDING_ZION_ENROLL_TREND", type: "badge", sortable: true },
-                { key: "faculty_load", label: "Median Faculty Advising Load", zionField: "PENDING_ZION_FAC_LOAD", sortable: true },
-                { key: "sophia_pace", label: "SOPHIA On-Pace (Sophomores)", zionField: "PENDING_ZION_SOPHIA_PACE", jargon: "SOPHIA", sortable: true },
-                { key: "probation_rate", label: "Academic Probation %", zionField: "PENDING_ZION_PROB_PCT", type: "badge", sortable: true },
-                { key: "critical_shortages", label: "Critical Seat Shortages", zionField: "PENDING_ZION_SEAT_SHORTAGE", type: "badge", sortable: true }
+                { key: "division", label: "Academic Division / School", zionField: "J1: courses[].division", sortable: true },
+                { key: "grad_rate_4yr", label: "4-Yr Graduation Rate", zionField: "J1: declared.expected_grad_year", sortable: true },
+                { key: "trend_3yr", label: "3-Yr Enrollment Trend", zionField: "J1: /terms + /catalog/sections", type: "badge", sortable: true },
+                { key: "faculty_load", label: "Median Faculty Advising Load", zionField: "J1: caseload.count (by advisor)", sortable: true },
+                { key: "sophia_pace", label: "SOPHIA On-Pace (Sophomores)", zionField: "J1: audit.gen_ed.hrs_earned / 45", jargon: "SOPHIA", sortable: true },
+                { key: "probation_rate", label: "Academic Probation %", zionField: "J1: cum_gpa_ok=false %", type: "badge", sortable: true },
+                { key: "critical_shortages", label: "Critical Seat Shortages", zionField: "J1: sections[].seats_left + waitlisted", type: "badge", sortable: true }
               ],
               rowActions: [
                 { id: "drill-division", label: "View Division Programs", icon: "📂" },
@@ -280,19 +280,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Degree Clearance, Substitutions & Policy Override Queue [Hypothetical Pre-Zion Fields]",
+              title: "Degree Clearance, Substitutions & Policy Override Queue [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Registrar compliance queue showing student ID, name, clearance item type, SOPHIA or major rule affected, residency credits, and approval status.",
               a11ySummary: "Registrar operational queue for degree clearance, transfer equivalencies, credit overloads, and policy overrides.",
               rowHeaderKey: "student_name",
               rowsPath: "/clearanceRows",
               columns: [
-                { key: "student_id", label: "Student ID", zionField: "PENDING_ZION_STU_ID", sortable: true },
-                { key: "student_name", label: "Student Name", zionField: "PENDING_ZION_FULL_NAME", sortable: true },
-                { key: "request_type", label: "Compliance / Exception Type", zionField: "PENDING_ZION_EXCEPTION_TYPE", type: "badge", jargon: "Prerequisite Override", sortable: true },
-                { key: "course_or_rule", label: "Course / Catalog Rule", zionField: "PENDING_ZION_CATALOG_RULE", sortable: true },
-                { key: "earned_residency", label: "Earned / Residency Credits", zionField: "PENDING_ZION_RESIDENCY_CR", jargon: "Residency Requirement", sortable: true },
-                { key: "submitted_by", label: "Endorsed By (Chair/Advisor)", zionField: "PENDING_ZION_ENDORSER", sortable: true },
-                { key: "clearance_status", label: "Registrar Status", zionField: "PENDING_ZION_REG_STATUS", type: "badge", sortable: true }
+                { key: "student_id", label: "Student ID", zionField: "J1: id_num / advisee_id", sortable: true },
+                { key: "student_name", label: "Student Name", zionField: "J1: name / advisee_name", sortable: true },
+                { key: "request_type", label: "Compliance / Exception Type", zionField: "J1: audit.programs[].error_code", type: "badge", jargon: "Prerequisite Override", sortable: true },
+                { key: "course_or_rule", label: "Course / Catalog Rule", zionField: "J1: declared.catalog_year + degree_rules", sortable: true },
+                { key: "earned_residency", label: "Earned / Residency Credits", zionField: "J1: degree_rules.residency.meets_50", jargon: "Residency Requirement", sortable: true },
+                { key: "submitted_by", label: "Endorsed By (Chair/Advisor)", zionField: "J1: requires_clearance / advisor", sortable: true },
+                { key: "clearance_status", label: "Registrar Status", zionField: "J1: registration[].status_label", type: "badge", sortable: true }
               ],
               rowActions: [
                 { id: "approve-record", label: "Approve & Post to Audit", icon: "✓" },
@@ -388,19 +388,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Student Success Early Warning, Holds & Accessibility Support Roster [Hypothetical Pre-Zion Fields]",
+              title: "Student Success Early Warning, Holds & Accessibility Support Roster [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Student Success care roster listing students with early warning flags, academic standing, registration holds, international F-1 or accommodation notes, and outreach status.",
               a11ySummary: "Prioritized student support table with non-color risk indicators and accessibility/international student safeguards.",
               rowHeaderKey: "student_name",
               rowsPath: "/cohortRows",
               columns: [
-                { key: "student_name", label: "Student Name & Cohort", zionField: "PENDING_ZION_FULL_NAME", sortable: true },
-                { key: "early_warnings", label: "Early Warning Flags", zionField: "PENDING_ZION_ALERT_COUNT", type: "badge", sortable: true },
-                { key: "standing_sap", label: "Standing & SAP", zionField: "PENDING_ZION_ACAD_STANDING", type: "badge", jargon: "SAP", sortable: true },
-                { key: "active_holds", label: "Active Holds", zionField: "PENDING_ZION_HOLD_CODES", type: "badge", jargon: "Hold", sortable: true },
-                { key: "intl_a11y_context", label: "International / Accessibility Context", zionField: "PENDING_ZION_SUPPORT_FLAGS", jargon: "F-1 Full-Time Load", sortable: true },
-                { key: "next_term_reg", label: "Next Term Registered?", zionField: "PENDING_ZION_NEXT_REG_FLAG", type: "badge", sortable: true },
-                { key: "success_advisor", label: "Success Lead", zionField: "PENDING_ZION_SUCCESS_ADV", sortable: true }
+                { key: "student_name", label: "Student Name & Cohort", zionField: "J1: name / advisee_name", sortable: true },
+                { key: "early_warnings", label: "Early Warning Flags", zionField: "J1: min_grade.below_c_minus[]", type: "badge", sortable: true },
+                { key: "standing_sap", label: "Standing & SAP", zionField: "J1: cumulative_gpa + cum_gpa_ok", type: "badge", jargon: "SAP", sortable: true },
+                { key: "active_holds", label: "Active Holds", zionField: "J1: holds[].hold_cde + blocks_registration", type: "badge", jargon: "Hold", sortable: true },
+                { key: "intl_a11y_context", label: "International / Accessibility Context", zionField: "J1: registered_credits>=12 + [Phase 2 BIOGRAPH]", jargon: "F-1 Full-Time Load", sortable: true },
+                { key: "next_term_reg", label: "Next Term Registered?", zionField: "J1: registration-window.add_open_now", type: "badge", sortable: true },
+                { key: "success_advisor", label: "Success Lead", zionField: "J1: ADVISING_ACCESS (X-User-Id)", sortable: true }
               ],
               rowActions: [
                 { id: "log-outreach", label: "Schedule Care Check-In", icon: "📅" },
@@ -495,19 +495,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "School / College Departmental Credit Production, Retention & Bottlenecks [Hypothetical Pre-Zion Fields]",
+              title: "School / College Departmental Credit Production, Retention & Bottlenecks [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Dean's summary table comparing departments within the school by credit hour production, retention rate, eligible graduates, average time to degree, and course bottlenecks.",
               a11ySummary: "Provides school-level leadership view across departments.",
               rowHeaderKey: "department_program",
               rowsPath: "/schoolRows",
               columns: [
-                { key: "department_program", label: "Department / Major Program", zionField: "PENDING_ZION_DEPT_CODE", sortable: true },
-                { key: "credit_hours", label: "Term Credit Hour Production", zionField: "PENDING_ZION_SCH_TOTAL", sortable: true },
-                { key: "retention_rate", label: "Major Retention Rate", zionField: "PENDING_ZION_RET_RATE", type: "badge", sortable: true },
-                { key: "grad_candidates", label: "Eligible Graduation Candidates", zionField: "PENDING_ZION_GRAD_ELIG", sortable: true },
-                { key: "avg_time_degree", label: "Avg Time-to-Degree", zionField: "PENDING_ZION_TTD_YRS", sortable: true },
-                { key: "bottleneck_status", label: "Required Course Bottlenecks", zionField: "PENDING_ZION_BOTTLENECK", type: "badge", sortable: true },
-                { key: "exceptions_approved", label: "Degree Exceptions (Term)", zionField: "PENDING_ZION_EXCEPT_CNT", sortable: true }
+                { key: "department_program", label: "Department / Major Program", zionField: "J1: subject / department_override", sortable: true },
+                { key: "credit_hours", label: "Term Credit Hour Production", zionField: "J1: sum(sections[].enrolled * credit_hrs)", sortable: true },
+                { key: "retention_rate", label: "Major Retention Rate", zionField: "J1 [Phase 2]: Unit Retention Rollup", type: "badge", sortable: true },
+                { key: "grad_candidates", label: "Eligible Graduation Candidates", zionField: "J1: total_credits.requirements_complete", sortable: true },
+                { key: "avg_time_degree", label: "Avg Time-to-Degree", zionField: "J1: expected_grad_year - catalog_year", sortable: true },
+                { key: "bottleneck_status", label: "Required Course Bottlenecks", zionField: "J1: sections[].seats_left <= 1", type: "badge", sortable: true },
+                { key: "exceptions_approved", label: "Degree Exceptions (Term)", zionField: "J1: audit.programs[].incomplete_requirements", sortable: true }
               ],
               rowActions: [
                 { id: "inspect-dept", label: "Review Department Plan", icon: "📊" }
@@ -586,19 +586,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Arts & Sciences Divisional Area Department Comparison [Hypothetical Pre-Zion Fields]",
+              title: "Arts & Sciences Divisional Area Department Comparison [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Area Chair table comparing departments in the divisional area by major enrollment, withdrawal rate, foundational completion, advising load, and course substitutions.",
               a11ySummary: "Supports cross-departmental coordination for Area Chairs.",
               rowHeaderKey: "dept_name",
               rowsPath: "/areaRows",
               columns: [
-                { key: "dept_name", label: "Area Department", zionField: "PENDING_ZION_DEPT_NAME", sortable: true },
-                { key: "active_majors", label: "Declared Majors (Growth)", zionField: "PENDING_ZION_MAJOR_CNT", sortable: true },
-                { key: "withdrawal_rate", label: "Course Withdrawal Rate", zionField: "PENDING_ZION_W_RATE", type: "badge", jargon: "DFW Rate", sortable: true },
-                { key: "foundational_completion", label: "Foundational Req Completion", zionField: "PENDING_ZION_FOUND_PCT", sortable: true },
-                { key: "advising_load", label: "Avg Advising Load / Faculty", zionField: "PENDING_ZION_ADV_LOAD", sortable: true },
-                { key: "cross_bottleneck", label: "Cross-Dept Bottleneck Course", zionField: "PENDING_ZION_BOTTLENECK_CRS", type: "badge", sortable: true },
-                { key: "substitutions_yr", label: "Grad Substitutions Needed", zionField: "PENDING_ZION_SUB_CNT", sortable: true }
+                { key: "dept_name", label: "Area Department", zionField: "J1: subject (courses[])", sortable: true },
+                { key: "active_majors", label: "Declared Majors (Growth)", zionField: "J1: caseload?scope=all (by major)", sortable: true },
+                { key: "withdrawal_rate", label: "Course Withdrawal Rate", zionField: "J1: status_label=withdrawn", type: "badge", jargon: "DFW Rate", sortable: true },
+                { key: "foundational_completion", label: "Foundational Req Completion", zionField: "J1: audit.gen_ed.hrs_earned", sortable: true },
+                { key: "advising_load", label: "Avg Advising Load / Faculty", zionField: "J1: caseload.count / total_students", sortable: true },
+                { key: "cross_bottleneck", label: "Cross-Dept Bottleneck Course", zionField: "J1: catalog/sections (min_seats=0)", type: "badge", sortable: true },
+                { key: "substitutions_yr", label: "Grad Substitutions Needed", zionField: "J1: degree_rules.department_override", sortable: true }
               ],
               rowActions: [
                 { id: "coord-chair", label: "Coordinate with Dept Chair", icon: "💬" }
@@ -678,18 +678,18 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Program Curriculum, Capstone Readiness & Substitution Queue [Hypothetical Pre-Zion Fields]",
+              title: "Program Curriculum, Capstone Readiness & Substitution Queue [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Program Director table showing program courses and student exception requests with enrollment, DFW rate, capstone status, and substitution actions.",
               a11ySummary: "Enables Program Directors to monitor core courses, elective tracks, and approve substitutions.",
               rowHeaderKey: "item_title",
               rowsPath: "/programRows",
               columns: [
-                { key: "item_title", label: "Course / Student Request", zionField: "PENDING_ZION_PROG_ITEM", sortable: true },
-                { key: "category_track", label: "Program Requirement / Track", zionField: "PENDING_ZION_TRACK_CODE", sortable: true },
-                { key: "enrollment_cap", label: "Next Term Enrollment / Cap", zionField: "PENDING_ZION_ENROLL_RATIO", type: "badge", sortable: true },
-                { key: "dfw_rate", label: "Historical DFW Rate", zionField: "PENDING_ZION_DFW_PCT", jargon: "DFW Rate", sortable: true },
-                { key: "capstone_impact", label: "Capstone / Graduation Impact", zionField: "PENDING_ZION_CAPSTONE_FLAG", sortable: true },
-                { key: "director_action", label: "Program Director Status", zionField: "PENDING_ZION_DIR_STATUS", type: "badge", sortable: true }
+                { key: "item_title", label: "Course / Student Request", zionField: "J1: audit.programs[].description", sortable: true },
+                { key: "category_track", label: "Program Requirement / Track", zionField: "J1: audit.programs[].code (CONC)", sortable: true },
+                { key: "enrollment_cap", label: "Next Term Enrollment / Cap", zionField: "J1: sections[].enrolled / capacity", type: "badge", sortable: true },
+                { key: "dfw_rate", label: "Historical DFW Rate", zionField: "J1: below_c_minus[] + [Phase 2 DFW %]", jargon: "DFW Rate", sortable: true },
+                { key: "capstone_impact", label: "Capstone / Graduation Impact", zionField: "J1: course-eligibility (4000-level)", sortable: true },
+                { key: "director_action", label: "Program Director Status", zionField: "J1: requires_advisor_approval", type: "badge", sortable: true }
               ],
               rowActions: [
                 { id: "approve-sub", label: "Approve Exception", icon: "✓" },
@@ -784,18 +784,18 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Department Faculty Advising Load & Gateway Course Capacity [Hypothetical Pre-Zion Fields]",
+              title: "Department Faculty Advising Load & Gateway Course Capacity [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Department Chair table listing faculty advisors, current advisee count, capacity status, pending prerequisite overrides, and advisees needing registration outreach.",
               a11ySummary: "Helps Department Chairs balance faculty advising rosters and manage course sections.",
               rowHeaderKey: "faculty_advisor",
               rowsPath: "/facultyLoadRows",
               columns: [
-                { key: "faculty_advisor", label: "Department Faculty Advisor", zionField: "PENDING_ZION_FAC_NAME", sortable: true },
-                { key: "assigned_advisees", label: "Assigned Advisees", zionField: "PENDING_ZION_ADV_COUNT", sortable: true },
-                { key: "load_status", label: "Advising Capacity Status", zionField: "PENDING_ZION_CAP_STATUS", type: "badge", sortable: true },
-                { key: "unregistered_count", label: "Advisees Not Yet Registered", zionField: "PENDING_ZION_UNREG_CNT", sortable: true },
-                { key: "probation_advisees", label: "Advisees on Probation/Warning", zionField: "PENDING_ZION_PROB_CNT", type: "badge", sortable: true },
-                { key: "pending_overrides", label: "Pending Prereq Overrides", zionField: "PENDING_ZION_OVERRIDE_CNT", jargon: "Prerequisite Override", sortable: true }
+                { key: "faculty_advisor", label: "Department Faculty Advisor", zionField: "J1: sections[].instructor", sortable: true },
+                { key: "assigned_advisees", label: "Assigned Advisees", zionField: "J1: caseload.count", sortable: true },
+                { key: "load_status", label: "Advising Capacity Status", zionField: "J1: sections[].status + seats_left", type: "badge", sortable: true },
+                { key: "unregistered_count", label: "Advisees Not Yet Registered", zionField: "J1: caseload?status=unregistered", sortable: true },
+                { key: "probation_advisees", label: "Advisees on Probation/Warning", zionField: "J1: cum_gpa < 2.0 (cum_gpa_ok=false)", type: "badge", sortable: true },
+                { key: "pending_overrides", label: "Pending Prereq Overrides", zionField: "J1: degree_rules.department_override", jargon: "Prerequisite Override", sortable: true }
               ],
               rowActions: [
                 { id: "assign-majors", label: "Assign New Majors", icon: "➕" },
@@ -890,19 +890,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "My Assigned Advisees Roster (Scoped: Assigned Advisees Only) [Hypothetical Pre-Zion Fields]",
+              title: "My Assigned Advisees Roster (Scoped: Assigned Advisees Only) [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Academic Advisor roster showing your assigned advisees, remaining credits to 124, SOPHIA Gen-Ed status, registration holds, midterm alerts, F-1/accessibility context, and next-term registration status.",
               a11ySummary: "1-on-1 advising table with screen-reader descriptions, non-color status badges, and international/accessibility indicators.",
               rowHeaderKey: "student_name",
               rowsPath: "/adviseeRows",
               columns: [
-                { key: "student_name", label: "Advisee Name & Class", zionField: "PENDING_ZION_FULL_NAME", sortable: true },
-                { key: "major_program", label: "Major & Career Track", zionField: "PENDING_ZION_MAJOR_CIP_CODE", sortable: true },
-                { key: "credits_remaining", label: "Earned / Remaining (of 124)", zionField: "PENDING_ZION_EARNED_CREDITS", sortable: true },
-                { key: "sophia_remaining", label: "Remaining SOPHIA Gen-Ed", zionField: "PENDING_ZION_CORE_AUDIT_STATUS", jargon: "SOPHIA", sortable: true },
-                { key: "holds_and_sap", label: "Holds & Financial Aid SAP", zionField: "PENDING_ZION_HOLD_CODES", type: "badge", jargon: "Hold", sortable: true },
-                { key: "midterm_and_visa", label: "Midterm < C / F-1 / Access Notes", zionField: "PENDING_ZION_SUPPORT_FLAGS", type: "badge", jargon: "F-1 Full-Time Load", sortable: true },
-                { key: "spring_reg_status", label: "Next Term Registration", zionField: "PENDING_ZION_NEXT_REG_FLAG", type: "badge", sortable: true }
+                { key: "student_name", label: "Advisee Name & Class", zionField: "J1: name / advisee_name", sortable: true },
+                { key: "major_program", label: "Major & Career Track", zionField: "J1: declared.major / concentration", sortable: true },
+                { key: "credits_remaining", label: "Earned / Remaining (of 124)", zionField: "J1: audit.total_credits.earned", sortable: true },
+                { key: "sophia_remaining", label: "Remaining SOPHIA Gen-Ed", zionField: "J1: audit.gen_ed.met (Sophia Core)", jargon: "SOPHIA", sortable: true },
+                { key: "holds_and_sap", label: "Holds & Financial Aid SAP", zionField: "J1: holds[].hold_cde + blocks_registration", type: "badge", jargon: "Hold", sortable: true },
+                { key: "midterm_and_visa", label: "Midterm < C / F-1 / Access Notes", zionField: "J1: registered_credits>=12 + [Phase 2 BIOGRAPH]", type: "badge", jargon: "F-1 Full-Time Load", sortable: true },
+                { key: "spring_reg_status", label: "Next Term Registration", zionField: "J1: registration-window.add_open_now", type: "badge", sortable: true }
               ],
               rowActions: [
                 { id: "open-1on1", label: "Open 1-on-1 Degree Plan", icon: "🧭" },
@@ -1023,18 +1023,18 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Recommended Next-Semester Courses & Remaining Degree Requirements [Hypothetical Pre-Zion Fields]",
+              title: "Recommended Next-Semester Courses & Remaining Degree Requirements [Zion J1PRD Connector API v1.0]",
               a11yCaption: "Your personalized course plan for next semester showing course code, title, credits, which requirement it fulfills, prerequisite status, and accessible format availability.",
               a11ySummary: "Lists recommended courses for your next semester at Augustana University with plain-language requirement tags.",
               rowHeaderKey: "course_code",
               rowsPath: "/recommendedCourses",
               columns: [
-                { key: "course_code", label: "Course Code & Title", zionField: "PENDING_ZION_CRS_CODE", sortable: true },
-                { key: "credits", label: "Credits", zionField: "PENDING_ZION_CRS_CREDITS", sortable: true },
-                { key: "fulfills_req", label: "Fulfills Requirement", zionField: "PENDING_ZION_DEG_REQ", type: "badge", jargon: "SOPHIA", sortable: true },
-                { key: "prereq_status", label: "Prerequisite & Eligibility", zionField: "PENDING_ZION_PREREQ_CHK", type: "badge", jargon: "Prerequisite Override", sortable: true },
-                { key: "schedule_modality", label: "Schedule & Accessible Format", zionField: "PENDING_ZION_SEC_MODALITY", sortable: true },
-                { key: "grad_impact", label: "Impact If Delayed / Dropped", zionField: "PENDING_ZION_GRAD_IMPACT", jargon: "F-1 Full-Time Load", sortable: true }
+                { key: "course_code", label: "Course Code & Title", zionField: "J1: crs_cde / items[].code", sortable: true },
+                { key: "credits", label: "Credits", zionField: "J1: credit_hrs / registered_credits", sortable: true },
+                { key: "fulfills_req", label: "Fulfills Requirement", zionField: "J1: open_requirements[].requirement", type: "badge", jargon: "SOPHIA", sortable: true },
+                { key: "prereq_status", label: "Prerequisite & Eligibility", zionField: "J1: course-eligibility.status + missing[]", type: "badge", jargon: "Prerequisite Override", sortable: true },
+                { key: "schedule_modality", label: "Schedule & Accessible Format", zionField: "J1: meetings[].building + days", sortable: true },
+                { key: "grad_impact", label: "Impact If Delayed / Dropped", zionField: "J1: incomplete_requirements[]", jargon: "F-1 Full-Time Load", sortable: true }
               ],
               rowActions: [
                 { id: "add-plan", label: "Add to Spring Schedule Plan", icon: "➕" },

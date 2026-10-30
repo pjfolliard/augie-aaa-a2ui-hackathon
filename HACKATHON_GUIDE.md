@@ -107,9 +107,19 @@ Every persona view at Augustana University must serve **blind, deaf, visually im
 
 ---
 
-## 4. How to Plug In the Zion Cloud Solutions Field List (Tonight / Tomorrow)
+## 4. Zion Cloud Solutions — Jenzabar J1 (`J1PRD`) Connector API Reference v1.0 (26 Endpoints)
 
-When **Zion Cloud Solutions** sends the official field list:
-1. **In the Browser Workbench:** Click **`🗂️ Zion Cloud Solutions Field Mapper`** in the top bar, paste the official Zion field codes next to each hypothetical field, and click **Apply Zion Field Mappings Live**.
-2. **Or via Coding Agent / Git:** Drop the file from Zion Cloud Solutions into `data/` and tell **Google Gemini CLI** (`gemini`) or **Antigravity**:
-   > *"Map the new Zion Cloud Solutions field list into `data/zion_schema_mapping.json` and update all `zionField` references in `docs/views/default-views.js`, then run `python3 scripts/validate_project.py`."*
+Full PDF saved in repository: [`data/Zion_AAA_Connector_API_Reference.pdf`](./data/Zion_AAA_Connector_API_Reference.pdf) (*Version 1.0, 24 September 2026*).
+
+* **Base URL:** `https://connector-api-385429559879.us-central1.run.app` (Google Cloud Run `us-central1`, project `fit-stream-495320-f6`)
+* **Data Source:** **Jenzabar J1 (`J1PRD`)**, read live over the site-to-site VPN (zero data cached; read-only `GET` endpoints only—no endpoint writes to J1).
+* **Authentication (2 Layers Required):**
+  1. `Authorization: Bearer <Google OIDC identity token>` (`roles/run.invoker`)
+  2. `X-User-Id: <J1 ID_NUM>` and `X-User-Role: student | advisor | advising_admin` (resolved from SSO email via `GET /identity/resolve?email=...`)
+* **26 Endpoints Across 5 Groups:**
+  * **Catalog (6):** `/health`, `/terms`, `/terms/resolve`, `/catalog/courses`, `/catalog/sections`, `/catalog/section`
+  * **Identity (2):** `/identity/resolve`, `/me/profile`
+  * **Student (8):** `/students/me/registration`, `/students/me/holds`, `/students/me/registration-window`, `/students/me/gpa`, `/students/me/schedule-conflicts`, `/students/me/course-eligibility`, `/students/me/recommend-next-term`, `/students/me/degree-progress` (`?detail=true&checklist=true&rules=true`)
+  * **Advisor (9):** `/advisors/me/caseload` (`?status=unregistered`), plus `/advisors/me/advisees/{adviseeId}/...` mirroring all 8 student routes (with automatic J1 ownership check returning `404` if not owned)
+  * **Administrator (2):** `/students/search?q=...` and `/advisors/me/caseload?yr=...&trm=...&scope=all` (`total: 3424`)
+* **All 100 Persona Views Now Mapped:** Every table column across [`docs/views/default-views.js`](./docs/views/default-views.js), [`docs/views/question-views.js`](./docs/views/question-views.js), and [`data/zion_schema_mapping.json`](./data/zion_schema_mapping.json) is now mapped to its official J1 Connector API v1.0 JSON path (or flagged `[Phase 2 J1 Query]` where aggregate/biographical fields are outside v1.0's 26 endpoints).

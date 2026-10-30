@@ -577,7 +577,9 @@
       `- **A2A Extension & Hosting:** Declare \`https://a2ui.org/a2a-extension/a2ui/v0.9\` on an **A2A v0.3** agent hosted on **Google Cloud Run** (Vertex AI Agent Engine is not supported for A2UI).`,
       `- **Security & Files:** Call **Model Armor** directly and re-validate \`action\` payloads server-side; deliver downloadable files (PDF degree audits, CSV exports) as **A2A file parts** rather than \`save_artifact\`.`,
       ``,
-      `## Available Hypothetical Fields (Pre-Zion Cloud Solutions Schema)`,
+      `## Official Zion Cloud Solutions Jenzabar J1 (J1PRD) Connector API v1.0 Fields`,
+      `- **Base URL:** \`https://connector-api-385429559879.us-central1.run.app\` (26 read-only \`GET\` endpoints over Jenzabar J1 \`J1PRD\`; never writes directly to J1)`,
+      `- **Auth & RBAC Headers:** \`Authorization: Bearer <OIDC>\` + \`X-User-Id: <J1 ID_NUM>\` + \`X-User-Role: student | advisor | advising_admin\``,
       fieldList,
       ``,
       `## Output Format`,
@@ -593,7 +595,10 @@
         (f, idx) => `
         <tr>
           <th scope="row" style="font-family:var(--font-mono); font-size:0.8rem;">${f.hypotheticalField}</th>
-          <td>${f.label}</td>
+          <td>
+            <div style="font-weight:700;">${f.label}</div>
+            <div style="font-family:var(--font-mono); font-size:0.74rem; color:var(--text-muted);">${f.zionTable || ""}</div>
+          </td>
           <td>
             <input
               type="text"
@@ -601,7 +606,7 @@
               style="min-height:38px; padding:0.3rem 0.6rem; font-family:var(--font-mono); font-size:0.8rem;"
               data-field-idx="${idx}"
               value="${f.zionOfficialField}"
-              aria-label="Official Zion Cloud Solutions field name for ${f.label}"
+              aria-label="Official Zion Cloud Solutions J1 field path for ${f.label}"
             />
           </td>
           <td style="font-size:0.82rem;">${f.plainLanguageDescription}</td>

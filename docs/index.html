@@ -24,11 +24,11 @@
     <div class="a11y-utility-bar" role="region" aria-label="Accessibility, International Student Support, and Schema Controls">
       <div class="a11y-utility-inner">
         <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.65rem;">
-          <span class="zion-banner-pill" title="Current fields are hypothetical pending tonight/tomorrow's official Zion Cloud Solutions field list">
-            ⚡ HYPOTHETICAL PRE-ZION SCHEMA
+          <span class="zion-banner-pill" title="Connected to Zion Cloud Solutions Jenzabar J1 (J1PRD) Connector API v1.0 Schema (26 Read-Only GET Endpoints)">
+            🔌 ZION J1PRD CONNECTOR API v1.0 (26 ENDPOINTS)
           </span>
           <button type="button" id="btn-open-zion-modal" class="a11y-btn" aria-haspopup="dialog">
-            🗂️ Zion Cloud Solutions Field Mapper
+            🗂️ Zion J1 Connector API &amp; Field Mapper
           </button>
         </div>
 
@@ -367,21 +367,21 @@
     <div id="zion-schema-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="zion-modal-title" hidden>
       <div class="modal-card">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:0.85rem;">
-          <h2 id="zion-modal-title" style="margin:0; color:var(--augie-navy);">🗂️ Zion Cloud Solutions — Field Schema Adapter</h2>
+          <h2 id="zion-modal-title" style="margin:0; color:var(--augie-navy);">🔌 Zion Cloud Solutions — Jenzabar J1 (<code>J1PRD</code>) Connector API v1.0 &amp; Field Mapper</h2>
           <button type="button" id="btn-close-zion-modal" class="a2ui-action-btn">✕ Close</button>
         </div>
         <p style="font-size:0.9rem; color:var(--text-secondary); margin-top:0;">
-          All fields in today's hackathon are <strong>hypothetical</strong>. When <strong>Zion Cloud Solutions</strong> sends the official field list tonight or tomorrow, type or paste the official Zion field names below (or update <code>data/zion_schema_mapping.json</code>) to immediately update column mappings across all 10 persona views.
+          Mapped to <strong>Zion Cloud Solutions' Academic Advising Agent Connector API Reference v1.0</strong> (<code>https://connector-api-385429559879.us-central1.run.app</code> · <strong>26 Read-Only <code>GET</code> Endpoints over Jenzabar J1 <code>J1PRD</code></strong> · Google Cloud Run <code>fit-stream-495320-f6</code> · Auth: <code>Bearer &lt;OIDC&gt;</code> + <code>X-User-Id</code> &amp; <code>X-User-Role: student | advisor | advising_admin</code>).
         </p>
         <div class="a2ui-table-scroll" style="max-height:420px; overflow-y:auto; margin-bottom:1rem;">
           <table class="a2ui-table">
-            <caption>Mapping between Hypothetical Hackathon Fields and Incoming Zion Cloud Solutions Official Fields</caption>
+            <caption>Mapping between A2UI Table Columns and Official Zion Cloud Solutions Jenzabar J1 (J1PRD) Connector API v1.0 Fields</caption>
             <thead>
               <tr>
-                <th scope="col">Hypothetical Key</th>
-                <th scope="col">Display Label</th>
-                <th scope="col">Official Zion Cloud Solutions Field Code</th>
-                <th scope="col">Plain-Language Description</th>
+                <th scope="col">A2UI Column Key</th>
+                <th scope="col">Display Label &amp; J1 Endpoint</th>
+                <th scope="col">Official Jenzabar J1 / Connector API v1.0 JSON Path</th>
+                <th scope="col">Plain-Language Description &amp; J1 Notes</th>
               </tr>
             </thead>
             <tbody id="zion-mapping-tbody"></tbody>
