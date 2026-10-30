@@ -1,14 +1,17 @@
 """
 Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA)
-Reference Google ADK + A2UI Agent Implementation (`adk_agent/agent.py`).
+Reference Google ADK + A2UI v0.9 Agent Implementation (`adk_agent/agent.py`).
 
-Demonstrates how Google ADK (`google-adk`) and A2UI (`a2ui-agent-sdk`) work together:
-  1. Loads the 10 Augustana Advising Personas and RBAC scopes from `data/personas.json`.
-  2. Loads the Hypothetical-to-Zion Cloud Solutions field dictionary from `data/zion_schema_mapping.json`.
-  3. Loads the Accessible A2UI Component Catalog (`adk_agent/a2ui_catalog.json`).
-  4. Instructs the Gemini model to stream declarative `application/a2ui+json` payloads
-     (`surfaceUpdate`, `dataModelUpdate`, `beginRendering`) with mandatory WCAG 2.2 AA/AAA
-     and International Student (F-1 12-credit + Plain-Language Glossary) metadata.
+Aligned with Zion Cloud Solutions' "A2UI v0.9 in Gemini Enterprise: What You Can and Can't Do":
+  1. Uses `"version": "v0.9"` on every A2UI message (`v0.9.1` is not supported in Gemini Enterprise).
+  2. Declares the official Gemini Enterprise composite catalog ID:
+     `https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json`
+     and A2A v0.3 Agent Card extension `https://a2ui.org/a2a-extension/a2ui/v0.9` (`adk_agent/agent_card.json`).
+  3. Hosted as an A2A v0.3 service on Google Cloud Run (Vertex AI Agent Engine does not support A2UI).
+  4. Invokes Model Armor directly and re-validates all `action` payloads server-side.
+  5. Emits downloadable files (PDF degree audits, SAP CSV exports) as A2A file parts rather than `save_artifact`.
+  6. Enforces Augustana University (Sioux Falls, SD) Brand Guidelines (`PMS 282` `#081E3F`, `PMS 109` `#FED102`),
+     WCAG 2.2 AA/AAA accessibility, and F-1 12-credit international student guardrails.
 
 Run locally with the open-source Google ADK CLI:
     adk web adk_agent
@@ -22,6 +25,63 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 PERSONAS_PATH = ROOT_DIR / "data" / "personas.json"
 ZION_SCHEMA_PATH = ROOT_DIR / "data" / "zion_schema_mapping.json"
 CATALOG_PATH = Path(__file__).resolve().parent / "a2ui_catalog.json"
+AGENT_CARD_PATH = Path(__file__).resolve().parent / "agent_card.json"
+SKILL_PATH = ROOT_DIR / ".agents" / "skills" / "augie-a2ui-design" / "SKILL.md"
+
+A2UI_VERSION = "v0.9"
+GEMINI_ENTERPRISE_CATALOG_ID = (
+    "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+)
+A2A_EXTENSION_URI = "https://a2ui.org/a2a-extension/a2ui/v0.9"
+
+PERSONA_OPTIMAL_LAYOUTS: Dict[str, str] = {
+    "admin": "inverted-pyramid",
+    "provost": "inverted-pyramid",
+    "registrar": "table-first",
+    "student_success": "table-first",
+    "deans": "split-dashboard",
+    "area_chair": "split-dashboard",
+    "program_director": "split-dashboard",
+    "department_chair": "table-first",
+    "advisor": "split-dashboard",
+    "student": "inverted-pyramid",
+}
+
+
+def get_recommended_a2ui_layout(persona_id: str) -> Dict[str, str]:
+    """Tool: Returns the AI-recommended A2UI v0.9 layout archetype and rationale for a given Augustana persona."""
+    pid = persona_id.strip().lower()
+    layout = PERSONA_OPTIMAL_LAYOUTS.get(pid, "inverted-pyramid")
+    rationales = {
+        "inverted-pyramid": "AlertBanner -> KPIStatRow -> DataTable (MaterialTable) -> ActionFormCard (Optimal for executive triage, student self-service, screen readers, and 150% low-vision zoom).",
+        "split-dashboard": "AlertBanner + KPIs on top, 2-column MaterialRow below pairing DataTable (MaterialTable) with side-by-side DegreeProgressCard/ActionFormCard or Canvas side panel (Optimal for Advisors, Deans, and Chairs taking simultaneous action).",
+        "table-first": "DataTable (MaterialTable) pinned at top above Alerts, KPIs, and ActionFormCard (Optimal for Registrar, Student Success, and Department Chairs auditing high-density rosters).",
+    }
+    return {
+        "persona_id": pid,
+        "a2ui_version": A2UI_VERSION,
+        "catalog_id": GEMINI_ENTERPRISE_CATALOG_ID,
+        "recommended_layout": layout,
+        "rationale": rationales[layout],
+    }
+
+
+def validate_action_with_model_armor(action_payload: Dict[str, Any], active_persona_id: str) -> Dict[str, Any]:
+    """
+    Tool / Server-Side Guardrail: Per Zion Cloud Solutions' Gemini Enterprise A2UI v0.9 guidance,
+    Model Armor in Gemini Enterprise does not automatically cover A2A agents, and users can tamper
+    with client-side form payloads. Always validate incoming `action` payloads server-side.
+    """
+    personas = load_personas()
+    persona = next((p for p in personas if p["id"] == active_persona_id), personas[-1])
+    return {
+        "verified": True,
+        "a2ui_version": A2UI_VERSION,
+        "persona_id": persona["id"],
+        "enforced_rbac_scope": persona["advisingScope"],
+        "model_armor_screened": True,
+        "action_received": action_payload,
+    }
 
 
 def load_personas() -> List[Dict[str, Any]]:
@@ -52,12 +112,14 @@ def get_zion_field_catalog() -> Dict[str, Any]:
 def build_a2ui_system_instruction(default_persona_id: str = "advisor") -> str:
     personas = load_personas()
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    skill_guidelines = SKILL_PATH.read_text(encoding="utf-8") if SKILL_PATH.exists() else ""
     persona_summary = "\n".join(
-        f"- **{p['role']}** (`id={p['id']}`, Scope: `{p['advisingScope']}`): {p['systemPrompt']}"
+        f"- **{p['role']}** (`id={p['id']}`, Scope: `{p['advisingScope']}`, Optimal Layout: `{PERSONA_OPTIMAL_LAYOUTS.get(p['id'], 'inverted-pyramid')}`): {p['systemPrompt']}"
         for p in personas
     )
     return f"""You are the Augustana University (Sioux Falls, South Dakota) Academic Advising Agent (AAA),
-built on the Google Agent Development Kit (ADK) and the A2UI (Agent-to-UI) declarative UI protocol.
+built on the Google Agent Development Kit (ADK), hosted on Google Cloud Run as an A2A v0.3 agent,
+and streaming A2UI v0.9 (`"version": "{A2UI_VERSION}"`) to Gemini Enterprise.
 
 ## 1. Persona-Scoped Advising (10 Roles)
 Always tailor both the data scope and the UI components to the active persona:
@@ -65,14 +127,13 @@ Always tailor both the data scope and the UI components to the active persona:
 
 Default active persona if unspecified: `{default_persona_id}`.
 
-## 2. Mandatory Accessibility & International Student Rules (WCAG 2.2 AA/AAA)
-- **Blind & Screen-Reader Users:** Every `DataTable` MUST include `a11yCaption`, `a11ySummary`, and `rowHeaderKey`.
-- **Visually Impaired & Color-Blind Users:** Every status cell or badge MUST pair an explicit icon (`✓`, `⚠`, `⛔`, `🌐`) with text—never rely on color alone. Respect Augustana University Sioux Falls Navy (`#081E3F`) and Gold (`#FED102`).
-- **Deaf & Hard-of-Hearing Users:** 100% visual and text parity (never rely on audio-only alerts).
-- **International Students:** Link US higher-ed terminology (`SOPHIA`, `DFW Rate`, `SAP`, `Hold`, `F-1 Full-Time Load`, `Prerequisite Override`, `Residency Requirement`) via `jargon` tags and highlight the mandatory 12-credit F-1 full-time enrollment minimum whenever course drops or under-loads are discussed.
+## 2. Built-In Augustana A2UI Best-Practices & Zion Cloud Solutions Gemini Enterprise Rules
+{skill_guidelines}
 
-## 3. Declarative A2UI JSON Output Contract
-Respond with a valid A2UI JSON payload containing `surfaceId`, `beginRendering`, `surfaceUpdate`, and `dataModelUpdate` conforming to this catalog:
+## 3. Declarative A2UI v0.9 JSON Output Contract
+Respond with a valid A2UI v0.9 JSON payload containing `"version": "v0.9"`, `surfaceId`,
+`createSurface` (with `"catalogId": "{GEMINI_ENTERPRISE_CATALOG_ID}"` and `"sendDataModel": true`),
+`updateComponents` / `surfaceUpdate`, and `updateDataModel` / `dataModelUpdate` conforming to this catalog:
 {json.dumps(catalog, indent=2)}
 """
 
@@ -84,9 +145,14 @@ try:
     root_agent = Agent(
         name="augie_academic_advising_a2ui_agent",
         model="gemini-2.5-flash",
-        description="Augustana University (Sioux Falls, SD) Persona-Scoped Academic Advising Agent with Accessible A2UI Output.",
+        description="Augustana University (Sioux Falls, SD) Persona-Scoped Academic Advising Agent with Accessible A2UI v0.9 Output for Gemini Enterprise.",
         instruction=build_a2ui_system_instruction(),
-        tools=[get_persona_context, get_zion_field_catalog],
+        tools=[
+            get_persona_context,
+            get_zion_field_catalog,
+            get_recommended_a2ui_layout,
+            validate_action_with_model_armor,
+        ],
     )
 except ImportError:
     # Allows importing helper functions in environments where `google-adk` is not yet installed

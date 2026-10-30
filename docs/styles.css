@@ -5,19 +5,19 @@
    ========================================================================== */
 
 :root {
-  /* Official Augustana University (Sioux Falls, SD) Brand Palette */
-  --augie-navy: #081e3f;        /* PMS 289 C / 282 C Primary Navy */
+  /* Official Augustana University (Sioux Falls, SD) Brand Palette (Brand Guidelines pp. 17–18) */
+  --augie-navy: #081e3f;        /* Primary Blue: PMS 282 (CMYK 100/82/10/64 | RGB 9/31/64 | HEX #081e3f) */
   --augie-navy-dark: #05142b;
   --augie-navy-light: #133363;
-  --augie-gold: #fed102;        /* PMS 109 C Primary Gold/Yellow */
-  --augie-gold-dark: #eaaa00;   /* PMS 124 C Secondary Gold */
+  --augie-gold: #fed102;        /* Primary Yellow: PMS 109 (CMYK 0/10/100/0 | RGB 255/209/0 | HEX #fed102) */
+  --augie-gold-dark: #eaaa00;   /* Accent Orange: PMS 124 (CMYK 0/29/100/1 | RGB 234/170/0 | HEX #EAAA00) */
   --augie-gold-soft: #fffbeb;
-  --augie-light-blue: #8d9ebc;  /* PMS 5425 C Accent Blue */
+  --augie-light-blue: #8d9ebc;  /* Secondary Light Blue: PMS 535 (CMYK 40/30/5/0 | RGB 141/158/188 | HEX #8D9EBC) */
   --augie-light-blue-soft: #eef2f7;
-  --augie-green: #789d4a;       /* PMS 363 C Viking Green */
-  --augie-brown: #c6aa76;
-  --augie-light-gray: #c8c9c7;
-  --augie-dark-gray: #a7a8a9;
+  --augie-green: #789d4a;       /* Accent Green: PMS 576 (CMYK 48/6/79/17 | RGB 120/157/74 | HEX #789D4A) */
+  --augie-brown: #c6aa76;       /* Accent Brown: PMS 466 (CMYK 13/25/52/6 | RGB 198/170/118 | HEX #C6AA76) */
+  --augie-light-gray: #c8c9c7;  /* Accent Light Gray: PMS Cool Gray 3 (RGB 200/201/199 | HEX #C8C9C7) */
+  --augie-dark-gray: #a7a8a9;   /* Accent Dark Gray: PMS Cool Gray 9 (RGB 167/168/169 | HEX #A7A8A9) */
 
   /* Surface & Text Tokens (WCAG 2.2 AAA High Contrast Checked) */
   --bg-page: #f3f6fa;
@@ -46,9 +46,9 @@
   --intl-bg: #e0f2fe;
   --intl-border: #0369a1;
 
-  /* Typography */
-  --font-sans: "Inter", "Gotham", "Myriad Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: "ITC Garamond Std", "EB Garamond", "Garamond", "Georgia", serif;
+  /* Typography (Brand Guidelines p. 28: Official fonts are ITC Garamond serif & Myriad Pro / Gotham sans-serif) */
+  --font-sans: "Myriad Pro", "Gotham", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "ITC Garamond Std", "ITC Garamond", "EB Garamond", "Garamond", "Georgia", serif;
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 
   --base-font-size: 16px;
@@ -210,33 +210,24 @@ body {
 .augie-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
-.augie-crest {
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
-  background: var(--augie-gold);
-  color: var(--augie-navy);
-  display: flex;
-  flex-direction: column;
+/* Brand Guidelines p. 16 & p. 27: Never enclose the logo in a shape, and preserve a clear field around the logo equal to the height of the "A" in Augustana */
+.augie-logo-link {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-family: var(--font-serif);
-  border: 2px solid #ffffff;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
   flex-shrink: 0;
-  line-height: 1;
+  text-decoration: none;
 }
-.augie-crest-main {
-  font-size: 1.35rem;
-  letter-spacing: -0.5px;
-}
-.augie-crest-sub {
-  font-size: 0.62rem;
-  font-family: var(--font-sans);
-  font-weight: 800;
-  margin-top: 2px;
+.augie-official-logo {
+  height: 62px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 .augie-title {
   margin: 0;
@@ -670,6 +661,60 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.15rem;
+}
+.a2ui-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.15rem;
+  align-items: start;
+}
+.a2ui-row-table-wide {
+  grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr);
+}
+.a2ui-split-main,
+.a2ui-split-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  min-width: 0;
+}
+html.a11y-scale-125 .a2ui-row-table-wide,
+html.a11y-scale-150 .a2ui-row-table-wide {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 1200px) {
+  .a2ui-row-table-wide {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Layout Switcher in Surface Toolbar */
+.layout-switcher-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-subtle);
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-subtle);
+}
+.layout-switcher-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--augie-navy);
+  white-space: nowrap;
+}
+.a2ui-layout-select {
+  min-height: 40px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--augie-navy);
+  background: #ffffff;
+  color: var(--augie-navy);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* AlertBanner */

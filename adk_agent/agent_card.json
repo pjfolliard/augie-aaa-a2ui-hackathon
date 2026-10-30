@@ -1,0 +1,32 @@
+{
+  "name": "augie_academic_advising_a2ui_agent",
+  "description": "Augustana University (Sioux Falls, SD) Persona-Scoped Academic Advising Agent (AAA) with WCAG 2.2 AAA A2UI v0.9 Output for Gemini Enterprise.",
+  "protocolVersion": "0.3.0",
+  "version": "1.0.0",
+  "provider": {
+    "organization": "Augustana University (Sioux Falls, South Dakota)",
+    "url": "https://www.augie.edu"
+  },
+  "hostingArchitecture": {
+    "runtime": "Google Cloud Run (A2A v0.3 HTTP Service)",
+    "note": "Per Zion Cloud Solutions' Gemini Enterprise A2UI v0.9 specification, Vertex AI Agent Engine is not supported for A2UI agents. Deploy to Cloud Run and grant roles/run.invoker to the Discovery Engine service agent (or use OAuth behind a custom domain / Load Balancer / Apigee).",
+    "safety": "Invoke Google Cloud Model Armor directly inside the agent and re-validate all A2UI form action payloads server-side.",
+    "fileDelivery": "Send downloadable files (e.g., PDF degree audits, Financial Aid SAP CSV exports) as A2A file parts, never via ADK save_artifact."
+  },
+  "capabilities": {
+    "streaming": true,
+    "extensions": [
+      {
+        "uri": "https://a2ui.org/a2a-extension/a2ui/v0.9",
+        "description": "Gemini Enterprise A2UI v0.9 declarative UI protocol extension",
+        "required": true,
+        "params": {
+          "version": "v0.9",
+          "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
+        }
+      }
+    ]
+  },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/plain", "application/json", "application/pdf", "text/csv"]
+}

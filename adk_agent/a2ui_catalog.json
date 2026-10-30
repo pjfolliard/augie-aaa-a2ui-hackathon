@@ -1,11 +1,57 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "catalogId": "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json",
-  "title": "Augustana University (Sioux Falls, SD) Accessible Academic Advising A2UI Component Catalog",
-  "description": "Declarative A2UI v0.9 component catalog for the Augustana Academic Advising Agent (AAA), enforcing WCAG 2.2 AA/AAA screen-reader semantics, Sioux Falls Navy (#081E3F) & Gold (#FED102) contrast, non-color status badges, plain-language higher-ed glossary tags, and F-1 international student guardrails.",
+  "version": "v0.9",
+  "catalogId": "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+  "augieOverlayCatalogId": "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json",
+  "a2aExtension": "https://a2ui.org/a2a-extension/a2ui/v0.9",
+  "a2aProtocolVersion": "v0.3",
+  "title": "Augustana University (Sioux Falls, SD) Accessible Academic Advising A2UI v0.9 Composite Catalog",
+  "description": "Declarative A2UI v0.9 component catalog aligned with Zion Cloud Solutions' Gemini Enterprise A2UI v0.9 specification ('version': 'v0.9', 4 messages out / 1 action back, 69 composite catalog components) and Augustana University's WCAG 2.2 AA/AAA screen-reader semantics, PMS 282 Navy (#081E3F) & PMS 109 Yellow (#FED102) contrast, non-color status badges, plain-language higher-ed glossary tags, and F-1 international student guardrails.",
+  "messageLifecycle": {
+    "outboundFromAgent": [
+      "createSurface (initializes surfaceId, catalogId, and sendDataModel: true)",
+      "updateComponents (streams flat component tree with parent/child IDs — legacy alias: surfaceUpdate)",
+      "updateDataModel (streams JSON Pointer data state — legacy alias: dataModelUpdate)",
+      "deleteSurface (closes surface when advising workflow completes)"
+    ],
+    "inboundFromUser": [
+      "action (returns action name, surfaceId, sourceComponentId, and resolved context values)"
+    ]
+  },
+  "geminiEnterpriseCatalogFamilies": {
+    "basic": [
+      "Text", "Image", "Icon", "Video", "AudioPlayer", "Row", "Column", "List",
+      "Card", "Tabs", "Modal", "Divider", "Button", "TextField", "CheckBox",
+      "ChoicePicker", "Slider", "DateTimeInput"
+    ],
+    "materialLayout": [
+      "MaterialCard", "MaterialRow", "MaterialColumn", "MaterialDialog",
+      "MaterialDivider", "MaterialExpansionPanel", "MaterialGridList"
+    ],
+    "materialDisplay": [
+      "MaterialText", "MaterialIcon", "MaterialImage", "MaterialBadge",
+      "MaterialProgressBar", "MaterialProgressSpinner", "MaterialTable"
+    ],
+    "materialActions": [
+      "MaterialButton", "MaterialIconButton", "MaterialMenu",
+      "MaterialTabs", "MaterialTab"
+    ],
+    "materialInput": [
+      "MaterialInput", "MaterialCheckbox", "MaterialSelect", "MaterialRadioButton",
+      "MaterialChips", "MaterialButtonToggle", "MaterialSlideToggle", "MaterialSlider",
+      "MaterialDatepicker", "MaterialTimepicker"
+    ],
+    "geminiEnterpriseExtras": [
+      "Canvas", "IFrameSrcdoc", "IFrameUrl"
+    ],
+    "experimentalUndocumented": [
+      "VegaChart", "FileUpload", "GoogleMap"
+    ]
+  },
   "components": {
     "Column": {
-      "description": "Vertical layout container with an accessible region label.",
+      "geminiEnterprisePrimitive": "MaterialColumn",
+      "description": "Vertical layout container with an accessible region label (Inverted-Pyramid linear reading order).",
       "required": ["a11yLabel", "children"],
       "properties": {
         "a11yLabel": { "type": "string" },
@@ -17,7 +63,37 @@
         }
       }
     },
+    "Row": {
+      "geminiEnterprisePrimitive": "MaterialRow",
+      "description": "Responsive multi-column split container that pairs a primary DataTable (MaterialTable) with side-by-side DegreeProgressCard or ActionFormCard panels on wide viewports and collapses to a single column at 125%-150% low-vision zoom.",
+      "required": ["a11yLabel", "children"],
+      "properties": {
+        "a11yLabel": { "type": "string" },
+        "ratio": { "type": "string", "enum": ["equal", "table-wide", "sidebar-left"] },
+        "children": {
+          "type": "object",
+          "properties": {
+            "explicitList": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "Canvas": {
+      "geminiEnterprisePrimitive": "Canvas",
+      "description": "Gemini Enterprise side-panel Canvas container for side-by-side degree audit simulation, course schedule building, or prerequisite override review.",
+      "required": ["title", "children"],
+      "properties": {
+        "title": { "type": "string" },
+        "children": {
+          "type": "object",
+          "properties": {
+            "explicitList": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
     "AlertBanner": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialIcon + MaterialText + MaterialBadge",
       "description": "Visual and screen-reader accessible alert banner with zero audio-only dependencies.",
       "required": ["severity", "icon", "title", "message"],
       "properties": {
@@ -29,6 +105,7 @@
       }
     },
     "KPIStatRow": {
+      "geminiEnterprisePrimitive": "MaterialGridList + MaterialCard + MaterialBadge",
       "description": "Grid of key performance indicator cards with non-color delta indicators.",
       "required": ["a11yLabel", "itemsPath"],
       "properties": {
@@ -37,7 +114,8 @@
       }
     },
     "DataTable": {
-      "description": "Accessible semantic HTML table with mandatory screen-reader caption, row header key, Zion Cloud Solutions field mapping, and keyboard-sortable columns.",
+      "geminiEnterprisePrimitive": "MaterialTable",
+      "description": "Accessible semantic HTML table (mapped to Gemini Enterprise MaterialTable) with mandatory screen-reader caption, row header key, Zion Cloud Solutions field mapping, and keyboard-sortable columns.",
       "required": ["title", "a11yCaption", "a11ySummary", "rowHeaderKey", "rowsPath", "columns"],
       "properties": {
         "title": { "type": "string" },
@@ -75,6 +153,7 @@
       }
     },
     "DegreeProgressCard": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialProgressBar",
       "description": "Accessible progress bars tracking 124-credit degree completion, SOPHIA Core, and F-1 12-credit status.",
       "required": ["title", "itemsPath"],
       "properties": {
@@ -84,7 +163,8 @@
       }
     },
     "ActionFormCard": {
-      "description": "Interactive form that emits an A2UI actionResponse back to the Google ADK agent.",
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialSelect + MaterialInput + MaterialButton",
+      "description": "Interactive form that emits an A2UI v0.9 action message back to the Google ADK agent on Cloud Run (with server-side Model Armor & RBAC re-validation).",
       "required": ["title", "fields", "submitLabel", "actionName"],
       "properties": {
         "title": { "type": "string" },

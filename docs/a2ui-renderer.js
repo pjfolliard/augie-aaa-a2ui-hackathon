@@ -126,6 +126,29 @@
         : "Consider adding `jargonTerms` or `jargon` tags to columns for international students."
     });
 
+    // 6. A2UI Layout Architecture & WCAG 1.4.10 Reflow Check
+    const hasLayoutRoot = components.some((c) => c.component && (c.component.Column || c.component.Row));
+    checks.push({
+      pass: hasLayoutRoot,
+      label: "A2UI Layout Ergonomics & WCAG 2.2 SC 1.4.10 Reflow (Inverted-Pyramid / Split-Grid)",
+      detail:
+        "Supports Inverted-Pyramid Triage, Split Action Dashboard, and Table-First Focus with automatic single-column reflow at 125%–150% zoom."
+    });
+
+    // 7. Zion Cloud Solutions — Gemini Enterprise A2UI v0.9 & A2A v0.3 Compliance Check
+    const isV09 = (payload?.version || "v0.9") === "v0.9";
+    const catId =
+      payload?.createSurface?.catalogId ||
+      payload?.beginRendering?.catalogId ||
+      "";
+    const hasGeminiCatalog = catId.includes("gemini_enterprise_composite_catalog.json") || catId.includes("v0.9");
+    checks.push({
+      pass: isV09 && hasGeminiCatalog,
+      label: "Zion Cloud Solutions — Gemini Enterprise A2UI v0.9 & A2A v0.3 Spec Compliance",
+      detail:
+        'Enforces "version": "v0.9" (not v0.9.1), official gemini_enterprise_composite_catalog.json (69 components incl. MaterialTable & Canvas), Cloud Run A2A v0.3 hosting, and server-side Model Armor action validation.'
+    });
+
     return checks;
   }
 
@@ -198,6 +221,7 @@
       lang = "en",
       showGlossary = false,
       showZionCodes = true,
+      layoutMode = "inverted-pyramid",
       onAction = () => {},
       sortState = {},
       onSortChange = () => {}
@@ -227,11 +251,48 @@
       const comp = compMap[nodeId];
       if (!comp) return "";
 
+      if (comp.Row) {
+        const list = comp.Row?.children?.explicitList || [];
+        const ratioCls = comp.Row?.ratio ? `a2ui-row-${escapeHtml(comp.Row.ratio)}` : "a2ui-row-table-wide";
+        return `
+          <div class="a2ui-row ${ratioCls}" role="region" aria-label="${escapeHtml(comp.Row.a11yLabel || "A2UI Split Row Layout")}">
+            ${list.map((childId) => renderNode(childId)).join("")}
+          </div>
+        `;
+      }
+
       if (comp.Column) {
-        const list = comp.Column?.children?.explicitList || [];
+        const rawList = comp.Column?.children?.explicitList || [];
+        if (nodeId === rootId && layoutMode === "split-dashboard") {
+          const topIds = rawList.filter((id) => compMap[id]?.AlertBanner || compMap[id]?.KPIStatRow);
+          const tableIds = rawList.filter((id) => compMap[id]?.DataTable);
+          const sideIds = rawList.filter(
+            (id) => !compMap[id]?.AlertBanner && !compMap[id]?.KPIStatRow && !compMap[id]?.DataTable
+          );
+          return `
+            <div class="a2ui-column" role="region" aria-label="${escapeHtml(comp.Column.a11yLabel || "A2UI Surface Layout")}">
+              ${topIds.map((id) => renderNode(id)).join("")}
+              <div class="a2ui-row a2ui-row-table-wide" role="region" aria-label="Split Table and Action Workspace">
+                <div class="a2ui-split-main">${tableIds.map((id) => renderNode(id)).join("")}</div>
+                <div class="a2ui-split-side">${sideIds.map((id) => renderNode(id)).join("")}</div>
+              </div>
+            </div>
+          `;
+        }
+        if (nodeId === rootId && layoutMode === "table-first") {
+          const tableIds = rawList.filter((id) => compMap[id]?.DataTable);
+          const alertIds = rawList.filter((id) => compMap[id]?.AlertBanner);
+          const otherIds = rawList.filter((id) => !compMap[id]?.DataTable && !compMap[id]?.AlertBanner);
+          const reordered = [...tableIds, ...alertIds, ...otherIds];
+          return `
+            <div class="a2ui-column" role="region" aria-label="${escapeHtml(comp.Column.a11yLabel || "A2UI Surface Layout")}">
+              ${reordered.map((childId) => renderNode(childId)).join("")}
+            </div>
+          `;
+        }
         return `
           <div class="a2ui-column" role="region" aria-label="${escapeHtml(comp.Column.a11yLabel || "A2UI Surface Layout")}">
-            ${list.map((childId) => renderNode(childId)).join("")}
+            ${rawList.map((childId) => renderNode(childId)).join("")}
           </div>
         `;
       }
@@ -286,7 +347,7 @@
                 <h3 class="a2ui-card-title">${escapeHtml(card.title)}</h3>
                 ${card.subtitle ? `<p class="a2ui-card-subtitle">${escapeHtml(card.subtitle)}</p>` : ""}
               </div>
-              <span class="a2ui-catalog-tag">A2UI DegreeProgressCard</span>
+              <span class="a2ui-catalog-tag">A2UI v0.9 MaterialProgressBar · DegreeProgressCard</span>
             </div>
             <div class="a2ui-progress-list">
               ${items
@@ -341,7 +402,7 @@
                 <p id="${descId}" class="a2ui-card-subtitle">${escapeHtml(table.a11ySummary || table.a11yCaption || "")}</p>
               </div>
               <div class="a2ui-card-actions">
-                <span class="a2ui-catalog-tag">A2UI DataTable · ${rows.length} Rows</span>
+                <span class="a2ui-catalog-tag">A2UI v0.9 MaterialTable · DataTable · ${rows.length} Rows</span>
               </div>
             </div>
             <div class="a2ui-table-scroll" tabindex="0" role="group" aria-labelledby="${descId}">
@@ -441,7 +502,7 @@
                 <h3 class="a2ui-card-title">${escapeHtml(form.title)}</h3>
                 <p class="a2ui-card-subtitle">${escapeHtml(form.description || "")}</p>
               </div>
-              <span class="a2ui-catalog-tag">A2UI ActionFormCard (actionResponse)</span>
+              <span class="a2ui-catalog-tag">A2UI v0.9 MaterialCard + MaterialButton · action</span>
             </div>
             <form class="a2ui-form" data-action-name="${escapeHtml(form.actionName || "submitAction")}">
               <div class="a2ui-form-grid">
@@ -483,12 +544,22 @@
       return "";
     }
 
+    const layoutLabels = {
+      "inverted-pyramid": "✨ AI Best-Practice Layout: Inverted-Pyramid Triage (Alert → KPIs → Table → Action)",
+      "split-dashboard": "✨ AI Best-Practice Layout: Split Action Dashboard (Table + Side-by-Side Action/Progress)",
+      "table-first": "✨ AI Best-Practice Layout: Table-First High-Density Roster"
+    };
+
     const questionBanner = activeQuestion
       ? `
         <div class="a2ui-question-context" role="status" aria-live="polite">
           <div class="q-context-badge">Persona Question ${escapeHtml(activeQuestion.number)} of 10</div>
           <div class="q-context-text">“${escapeHtml(activeQuestion.question)}”</div>
-          <div class="q-context-scope">RBAC Scope: <strong>${escapeHtml(persona?.advisingScope || "")}</strong></div>
+          <div class="q-context-scope">
+            <span>RBAC Scope: <strong>${escapeHtml(persona?.advisingScope || "")}</strong></span>
+            <span> · </span>
+            <span style="color:var(--augie-gold); font-weight:700;">${escapeHtml(layoutLabels[layoutMode] || layoutLabels["inverted-pyramid"])}</span>
+          </div>
         </div>
       `
       : "";

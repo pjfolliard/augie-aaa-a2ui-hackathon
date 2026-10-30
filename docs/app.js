@@ -23,10 +23,24 @@
     customViews[p.id] = JSON.parse(JSON.stringify(baseViews[p.id] || {}));
   });
 
+  const PERSONA_RECOMMENDED_LAYOUT = {
+    admin: "inverted-pyramid",
+    provost: "inverted-pyramid",
+    registrar: "table-first",
+    student_success: "table-first",
+    deans: "split-dashboard",
+    area_chair: "split-dashboard",
+    program_director: "split-dashboard",
+    department_chair: "table-first",
+    advisor: "split-dashboard",
+    student: "inverted-pyramid"
+  };
+
   const state = {
     activePersonaId: personas[0]?.id || "admin",
     activeQuestionIdx: 0,
     activeTab: "surface", // 'surface' | 'visual-builder' | 'json-editor' | 'a11y-audit' | 'hackathon-guide'
+    layoutMode: PERSONA_RECOMMENDED_LAYOUT[personas[0]?.id || "admin"] || "inverted-pyramid",
     highContrast: false,
     textScale: "100", // '100' | '125' | '150'
     wideSpacing: false,
@@ -45,14 +59,33 @@
     return (p?.questions || [])[state.activeQuestionIdx] || p?.questions?.[0] || null;
   }
 
+  function getActiveViewKey() {
+    const q = getActiveQuestion();
+    return `${state.activePersonaId}_q${q?.number || 1}`;
+  }
+
   function getActivePayload() {
-    return customViews[state.activePersonaId];
+    const key = getActiveViewKey();
+    if (customViews[key]) {
+      return customViews[key];
+    }
+    const p = getActivePersona();
+    const q = getActiveQuestion();
+    const base = customViews[state.activePersonaId] || baseViews[state.activePersonaId] || {};
+    if (window.AUGIE_QUESTION_VIEW_ADAPTER) {
+      const adapted = window.AUGIE_QUESTION_VIEW_ADAPTER.adaptPayloadForQuestion(base, p, q);
+      customViews[key] = adapted.payload;
+      return customViews[key];
+    }
+    return base;
   }
 
   function saveActivePayload(newPayload) {
+    const key = getActiveViewKey();
+    customViews[key] = newPayload;
     customViews[state.activePersonaId] = newPayload;
     try {
-      sessionStorage.setItem(`augie_a2ui_view_${state.activePersonaId}`, JSON.stringify(newPayload));
+      sessionStorage.setItem(`augie_a2ui_view_${key}`, JSON.stringify(newPayload));
     } catch (e) {
       // ignore storage quota errors
     }
@@ -109,8 +142,13 @@
         const pid = btn.getAttribute("data-persona-id");
         state.activePersonaId = pid;
         state.activeQuestionIdx = 0;
+        state.layoutMode = PERSONA_RECOMMENDED_LAYOUT[pid] || "inverted-pyramid";
+        const layoutSel = document.getElementById("sel-layout-mode");
+        if (layoutSel) layoutSel.value = state.layoutMode;
         const p = getActivePersona();
-        announcePolite(`Switched persona to ${p.role}. Advising scope: ${p.advisingScope}.`);
+        announcePolite(
+          `Switched persona to ${p.role}. Advising scope: ${p.advisingScope}. Auto-selected AI best-practice layout: ${state.layoutMode}.`
+        );
         renderAll();
       });
     });
@@ -171,8 +209,19 @@
         btn.addEventListener("click", () => {
           const idx = Number(btn.getAttribute("data-q-idx"));
           state.activeQuestionIdx = idx;
+          const p = getActivePersona();
           const q = getActiveQuestion();
-          announcePolite(`Selected Question ${q.number}: ${q.question}`);
+          if (window.AUGIE_QUESTION_VIEW_ADAPTER && q) {
+            const bp = window.AUGIE_QUESTION_VIEW_ADAPTER.inferQuestionBlueprint(p, q);
+            if (bp && bp.layout) {
+              state.layoutMode = bp.layout;
+              const layoutSel = document.getElementById("sel-layout-mode");
+              if (layoutSel) layoutSel.value = state.layoutMode;
+            }
+          }
+          announcePolite(
+            `Selected Question ${q.number}: ${q.question}. Auto-configured AI best-practice layout (${state.layoutMode}) and question-specific table view.`
+          );
           renderAll();
         });
       });
@@ -209,6 +258,7 @@
       lang: state.lang,
       showGlossary: state.showGlossary,
       showZionCodes: state.showZionCodes,
+      layoutMode: state.layoutMode,
       sortState: state.sortState,
       onSortChange: (tableId, colKey) => {
         const prev = state.sortState[tableId];
@@ -219,11 +269,38 @@
       },
       onAction: (evt) => {
         if (evt.type === "rowAction") {
+          // Live in-place A2UI dataModelUpdate simulation when a row action is clicked
+          const table = getPrimaryDataTableComponent(payload);
+          if (table) {
+            const dataModel = payload?.dataModelUpdate?.contents || {};
+            const rowsKey = (table.rowsPath || "").replace(/^\//, "");
+            const rows = Array.isArray(dataModel[rowsKey]) ? dataModel[rowsKey] : [];
+            const targetRow = rows.find((r) => String(r[table.rowHeaderKey]) === String(evt.target));
+            const badgeCol = table.columns.find((c) => c.type === "badge");
+            if (targetRow && badgeCol) {
+              targetRow[badgeCol.key] = `✓ ADK Action Applied (${evt.actionId})`;
+              saveActivePayload(payload);
+              renderMainSurface();
+              renderJsonEditor();
+            }
+          }
           showToast(
-            `A2UI actionResponse Dispatched to ADK Agent`,
-            `Persona "${p.role}" triggered action "${evt.actionId}" on record "${evt.target}" (Surface: ${evt.surfaceId}).`
+            `A2UI actionResponse Dispatched & Applied Live`,
+            `Persona "${p.role}" executed "${evt.actionId}" on "${evt.target}" (Q${q?.number || 1}) — updated table status badge in-place.`
           );
         } else if (evt.type === "formSubmit") {
+          const alertComp = (payload?.surfaceUpdate?.components || []).find(
+            (c) => c.component && c.component.AlertBanner
+          );
+          if (alertComp) {
+            alertComp.component.AlertBanner.severity = "info";
+            alertComp.component.AlertBanner.icon = "✓";
+            alertComp.component.AlertBanner.title = `✓ ADK Agent Executed Action: ${evt.actionName}`;
+            alertComp.component.AlertBanner.message = `Dispatched parameters ${JSON.stringify(evt.context)} for ${p.role} (Q${q?.number || 1}). Surface updated via A2UI dataModelUpdate.`;
+            saveActivePayload(payload);
+            renderMainSurface();
+            renderJsonEditor();
+          }
           showToast(
             `A2UI Form Submitted (${evt.actionName})`,
             `Payload sent to ADK Agent with context: ${JSON.stringify(evt.context)}`
@@ -398,9 +475,13 @@
     // Wire reset button
     document.getElementById("btn-reset-persona-view")?.addEventListener("click", () => {
       sessionStorage.removeItem(`augie_a2ui_view_${p.id}`);
+      for (let i = 1; i <= 10; i++) {
+        delete customViews[`${p.id}_q${i}`];
+        sessionStorage.removeItem(`augie_a2ui_view_${p.id}_q${i}`);
+      }
       customViews[p.id] = JSON.parse(JSON.stringify(baseViews[p.id]));
       renderAll();
-      showToast("View Reset", `Restored default A2UI surface for ${p.role}.`);
+      showToast("View Reset", `Restored AI Best-Practice A2UI surface for ${p.role} (Q1–Q10).`);
     });
   }
 
@@ -484,17 +565,23 @@
       `- **Target Question (Q${q?.number || 1}):** "${q?.question || ""}"`,
       ``,
       `## Mandatory Accessibility & Branding Requirements`,
-      `1. **Augustana University (Sioux Falls, SD) Brand Palette:** Primary Navy \`#081E3F\` (PMS 289 C) and Primary Gold \`#FED102\` (PMS 109 C).`,
-      `2. **Blind & Screen-Reader Users:** Every \`DataTable\` MUST include \`a11yCaption\`, \`a11ySummary\`, and \`rowHeaderKey\`.`,
+      `1. **Augustana University (Sioux Falls, SD) Brand Palette:** Primary Blue/Navy \`#081E3F\` (PMS 282, RGB 9/31/64) and Primary Yellow/Gold \`#FED102\` (PMS 109, RGB 255/209/0).`,
+      `2. **Blind & Screen-Reader Users:** Every \`DataTable\` (\`MaterialTable\`) MUST include \`a11yCaption\`, \`a11ySummary\`, and \`rowHeaderKey\`.`,
       `3. **Visually Impaired & Color-Blind Users:** Every status badge MUST pair an icon (\`✓\`, \`⚠\`, \`⛔\`, \`🌐\`) with explicit text—never rely on color alone.`,
       `4. **Deaf & Hard-of-Hearing Users:** 100% visual/text parity (zero audio-only alerts).`,
       `5. **International Students:** Link US higher-ed jargon terms (\`SOPHIA\`, \`DFW Rate\`, \`SAP\`, \`Hold\`, \`F-1 Full-Time Load\`, \`Prerequisite Override\`, \`Residency Requirement\`) and include F-1 12-credit full-time guardrails where relevant.`,
+      ``,
+      `## Gemini Enterprise A2UI v0.9 Technical Requirements (From Zion Cloud Solutions)`,
+      `- **Version:** Strictly \`"version": "v0.9"\` on every message (\`v0.9.1\` is not supported in Gemini Enterprise).`,
+      `- **Catalog ID:** \`https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json\` (69 built-in components across Basic, Material layout/display/actions/input, and Gemini Enterprise extras \`Canvas\`, \`IFrameSrcdoc\`, \`IFrameUrl\`).`,
+      `- **A2A Extension & Hosting:** Declare \`https://a2ui.org/a2a-extension/a2ui/v0.9\` on an **A2A v0.3** agent hosted on **Google Cloud Run** (Vertex AI Agent Engine is not supported for A2UI).`,
+      `- **Security & Files:** Call **Model Armor** directly and re-validate \`action\` payloads server-side; deliver downloadable files (PDF degree audits, CSV exports) as **A2A file parts** rather than \`save_artifact\`.`,
       ``,
       `## Available Hypothetical Fields (Pre-Zion Cloud Solutions Schema)`,
       fieldList,
       ``,
       `## Output Format`,
-      `Return valid A2UI JSON matching the structure in \`docs/views/default-views.js\` (\`surfaceId\`, \`beginRendering\`, \`surfaceUpdate\`, \`dataModelUpdate\`) so I can paste it directly into the Live A2UI JSON Editor or save it to \`docs/views/default-views.js\`.`
+      `Return valid A2UI v0.9 JSON matching the structure in \`docs/views/default-views.js\` (\`version: "v0.9"\`, \`surfaceId\`, \`createSurface\`, \`beginRendering\`, \`surfaceUpdate\`, \`dataModelUpdate\`) so I can paste it directly into the Live A2UI JSON Editor or save it to \`docs/views/default-views.js\`.`
     ].join("\n");
   }
 
@@ -541,6 +628,17 @@
         state.activeTab = btn.getAttribute("data-ws-tab");
         renderWorkspaceTabs();
       });
+    });
+
+    // A2UI Surface Layout Switcher
+    const layoutSel = document.getElementById("sel-layout-mode");
+    layoutSel?.addEventListener("change", () => {
+      state.layoutMode = layoutSel.value;
+      state.activeTab = "surface";
+      renderWorkspaceTabs();
+      renderMainSurface();
+      const labelText = layoutSel.options[layoutSel.selectedIndex]?.text || state.layoutMode;
+      showToast("A2UI Surface Layout Updated", `Switched active surface layout to: ${labelText}`);
     });
 
     // Apply JSON Editor button

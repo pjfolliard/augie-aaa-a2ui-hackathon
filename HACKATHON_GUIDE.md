@@ -3,7 +3,10 @@
 **Initiative:** Gemini Enterprise Campus-Wide Rollout — Academic Advising Agent (AAA)  
 **Leadership:** VP for Innovation & Director of Future Operations (Terence)  
 **Institution:** Augustana University, Sioux Falls, South Dakota (`augie.edu`)  
-**Brand Identity:** Official Sioux Falls Navy (`#081E3F`, PMS 289 C) & Gold (`#FED102`, PMS 109 C)  
+**GitHub Repository:** [`https://github.com/pjfolliard/augie-aaa-a2ui-hackathon`](https://github.com/pjfolliard/augie-aaa-a2ui-hackathon)  
+**Live GitHub Pages Workbench:** [`https://pjfolliard.github.io/augie-aaa-a2ui-hackathon/`](https://pjfolliard.github.io/augie-aaa-a2ui-hackathon/)  
+**Brand Identity:** [Official Augustana Brand Guidelines](https://issuu.com/augustanacollegesd/docs/augustana_university_brand_guidelines_requiremen) — Primary Blue (`#081E3F`, `PMS 282`) & Primary Yellow (`#FED102`, `PMS 109`), `ITC Garamond` & `Myriad Pro`/`Gotham`  
+**Built-In Agent Skill:** [`.agents/skills/augie-a2ui-design/SKILL.md`](./.agents/skills/augie-a2ui-design/SKILL.md) (and [`.gemini/skills/augie-a2ui-design/SKILL.md`](./.gemini/skills/augie-a2ui-design/SKILL.md))  
 **Data Schema Status:** Hypothetical Pre-Zion Schema (Ready for tonight/tomorrow's official **Zion Cloud Solutions** field dictionary)
 
 ---
@@ -44,14 +47,15 @@ This 120-minute sprint is designed so **you and Terence** (and future campus gro
 Split the 10 personas into two tracks (e.g., **Pete** takes *Executive & Unit Leadership: Provost, Deans, Area Chair, Department Chair, Student*; **Terence** takes *Systems, Operations & Direct Care: Admin, Registrar, Student Success, Program Director, Advisor*—or tackle priority personas together):
 
 For each persona:
-1. **Review Questions Q1–Q10** in the left sidebar. Ask: *"If this persona asks Q1 through Q10 during registration week, what exact table columns, badges, and 1-click buttons do they need on screen?"*
+1. **Click Questions Q1–Q10 (`10 Personas × 10 Questions = 100 AI-Curated Views`):**
+   * Rather than designing from scratch, every question (`Q1`–`Q10`) automatically loads an **AI Best-Practice Baseline** ([`docs/views/question-views.js`](./docs/views/question-views.js)) with its optimal **A2UI Layout Archetype** (`Inverted-Pyramid Triage`, `Split Action Dashboard`, or `Table-First Focus`), a question-specific Zion highlight column, sorted rows, and in-place interactive row actions.
+   * You can also manually compare the 3 layouts anytime using the **`📐 A2UI Layout`** dropdown in the toolbar.
 2. **Option A — No-Code Visual Table Designer:**
    * Click the **`🛠️ Visual Table & Column Designer`** tab.
    * Add, remove, or rename columns from the Hypothetical/Zion Field Catalog and click **Add Column & Update Live A2UI View**.
-3. **Option B — Use Any Coding Agent (`gemini-cli`, Antigravity, Workspace Gemini, Claude Code, Cursor):**
-   * Click **`🤖 Copy Prompt for Any Coding Agent`** in the top header.
-   * Paste the prompt into your preferred coding agent and ask it to tailor the table or add a new card for a specific question.
-   * Paste the generated JSON into the **`{ } A2UI JSON Stream Editor`** tab (or let your coding agent edit `docs/views/default-views.js` directly).
+3. **Option B — Use Any Coding Agent with Built-In Best-Practice Skill (`gemini-cli`, Antigravity, Workspace Gemini, Claude Code, Cursor):**
+   * Because the repository includes [`.agents/skills/augie-a2ui-design/SKILL.md`](./.agents/skills/augie-a2ui-design/SKILL.md), your coding agent already knows the 5–7 column density rule, layout selection matrix, official Augustana Brand Guidelines (`PMS 282` `#081E3F` / `PMS 109` `#FED102`), WCAG 2.2 AAA rules, and F-1 12-credit guardrails.
+   * Or click **`🤖 Copy Prompt for Any Coding Agent`** in the top header to copy a self-contained prompt for any external LLM.
 
 ### Phase 3: 360° Accessibility & International Student Pressure Test (`1:25 – 1:45` · 20 mins)
 Every persona view at Augustana University must serve **blind, deaf, visually impaired, and international students and staff**. Test each view against the 5 built-in controls in the top utility bar:
@@ -70,7 +74,40 @@ Every persona view at Augustana University must serve **blind, deaf, visually im
 
 ---
 
-## 3. How to Plug In the Zion Cloud Solutions Field List (Tonight / Tomorrow)
+## 3. Zion Cloud Solutions Technical Specification: A2UI v0.9 in Gemini Enterprise ("What You Can and Can't Do")
+
+![A2UI v0.9 Lifecycle: Four Messages Out, One Back](./docs/assets/a2ui-v09-lifecycle.png)
+
+**Zion Cloud Solutions** provided the official **Gemini Enterprise A2UI v0.9** architecture guide (`adk_agent/a2ui_catalog.json` and `adk_agent/agent_card.json` are already pre-configured with these rules):
+
+### Four Messages Out, One Back (`"version": "v0.9"`)
+* **Outbound from Agent:** `createSurface` → `updateComponents` (`surfaceUpdate`) → `updateDataModel` (`dataModelUpdate`) → `deleteSurface`
+* **Inbound from User:** `action` (button clicks and form inputs resolved from the data model)
+* **Composite Catalog ID:** `https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json`
+
+### 69 Built-In Catalog Components Available to Our Designs
+| Family | Components | How We Use Them in Augustana AAA |
+| :--- | :--- | :--- |
+| **Basic** | `Text`, `Image`, `Icon`, `Video`, `AudioPlayer`, `Row`, `Column`, `List`, `Card`, `Tabs`, `Modal`, `Divider`, `Button`, `TextField`, `CheckBox`, `ChoicePicker`, `Slider`, `DateTimeInput` | Structural layout containers (`Column`, `Row`) & accessible inputs |
+| **Material layout** | `MaterialCard`, `MaterialRow`, `MaterialColumn`, `MaterialDialog`, `MaterialDivider`, `MaterialExpansionPanel`, `MaterialGridList` | `KPIStatRow` (`MaterialGridList` + `MaterialCard`) & `Split Action Dashboard` (`MaterialRow`) |
+| **Material display** | `MaterialText`, `MaterialIcon`, `MaterialImage`, `MaterialBadge`, `MaterialProgressBar`, `MaterialProgressSpinner`, `MaterialTable` | **`DataTable` (`MaterialTable`)**, **`DegreeProgressCard` (`MaterialProgressBar`)**, status badges (`MaterialBadge`) |
+| **Material actions** | `MaterialButton`, `MaterialIconButton`, `MaterialMenu`, `MaterialTabs`, `MaterialTab` | In-table `rowActions` (`MaterialButton`) & form submissions |
+| **Material input** | `MaterialInput`, `MaterialCheckbox`, `MaterialSelect`, `MaterialRadioButton`, `MaterialChips`, `MaterialButtonToggle`, `MaterialSlideToggle`, `MaterialSlider`, `MaterialDatepicker`, `MaterialTimepicker` | **`ActionFormCard`** (`MaterialSelect`, `MaterialInput`, `MaterialDatepicker`) |
+| **Gemini Enterprise extras** | `Canvas` (side panel), `IFrameSrcdoc` (sandboxed HTML), `IFrameUrl` (allowlisted sites only) | Side-panel degree audit & schedule simulator (`Canvas`) |
+
+### What You Can't Do in Gemini Enterprise A2UI v0.9 (And What to Do Instead)
+| You Can't... | Do This Instead |
+| :--- | :--- |
+| **Use A2UI `v0.9.1`** | Stick to `"version": "v0.9"` on every message. |
+| **Host on Vertex AI Agent Engine** | Host as an **A2A v0.3 agent on Google Cloud Run** (`adk_agent/agent_card.json`). |
+| **Authenticate with API keys or custom headers** | Grant `roles/run.invoker` to the Discovery Engine service agent on `.run.app`, or use OAuth behind a custom domain / Load Balancer / Apigee. |
+| **Rely on Gemini Enterprise Model Armor automatically** | Call **Model Armor** from the agent and re-validate all `action` form values server-side (`validate_action_with_model_armor` in `adk_agent/agent.py`). |
+| **Send files via ADK `save_artifact`** | Send downloadable files (PDF degree audits, SAP CSV exports) as **A2A file parts**. |
+| **Put links or images inside `Text`** | Use `Image`/`MaterialImage` for images and `MaterialButton`/`MaterialCard` with an `openUrl` action for links. |
+
+---
+
+## 4. How to Plug In the Zion Cloud Solutions Field List (Tonight / Tomorrow)
 
 When **Zion Cloud Solutions** sends the official field list:
 1. **In the Browser Workbench:** Click **`🗂️ Zion Cloud Solutions Field Mapper`** in the top bar, paste the official Zion field codes next to each hypothetical field, and click **Apply Zion Field Mappings Live**.

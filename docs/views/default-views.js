@@ -13,11 +13,17 @@
 
 window.AUGIE_DEFAULT_A2UI_VIEWS = {
   admin: {
+    version: "v0.9",
     surfaceId: "augie-aaa-admin-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-admin-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-admin-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-admin-surface",
@@ -116,11 +122,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   provost: {
+    version: "v0.9",
     surfaceId: "augie-aaa-provost-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-provost-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-provost-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-provost-surface",
@@ -219,11 +231,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   registrar: {
+    version: "v0.9",
     surfaceId: "augie-aaa-registrar-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-registrar-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-registrar-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-registrar-surface",
@@ -321,11 +339,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   student_success: {
+    version: "v0.9",
     surfaceId: "augie-aaa-student-success-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-student-success-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-student-success-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-student-success-surface",
@@ -422,11 +446,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   deans: {
+    version: "v0.9",
     surfaceId: "augie-aaa-deans-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-deans-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-deans-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-deans-surface",
@@ -507,11 +537,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   area_chair: {
+    version: "v0.9",
     surfaceId: "augie-aaa-area-chair-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-area-chair-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-area-chair-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-area-chair-surface",
@@ -593,11 +629,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   program_director: {
+    version: "v0.9",
     surfaceId: "augie-aaa-program-director-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-program-director-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-program-director-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-program-director-surface",
@@ -693,11 +735,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   department_chair: {
+    version: "v0.9",
     surfaceId: "augie-aaa-department-chair-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-department-chair-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-department-chair-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-department-chair-surface",
@@ -793,11 +841,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   advisor: {
+    version: "v0.9",
     surfaceId: "augie-aaa-advisor-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-advisor-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-advisor-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-advisor-surface",
@@ -910,11 +964,17 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
   },
 
   student: {
+    version: "v0.9",
     surfaceId: "augie-aaa-student-surface",
+    createSurface: {
+      surfaceId: "augie-aaa-student-surface",
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json",
+      sendDataModel: true
+    },
     beginRendering: {
       surfaceId: "augie-aaa-student-surface",
       root: "root-layout",
-      catalogId: "https://augie.edu/a2ui/v0.9/advising-accessible-catalog.json"
+      catalogId: "https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json"
     },
     surfaceUpdate: {
       surfaceId: "augie-aaa-student-surface",

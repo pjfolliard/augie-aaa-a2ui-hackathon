@@ -21,11 +21,12 @@ You are assisting the VP for Innovation and the Director of Future Operations at
 10. `student` — **Student** (`Self Only`)
 
 ## 3. Mandatory Brand, Accessibility & International Student Rules
-1. **Official Augustana University (Sioux Falls, SD) Brand Palette:**
-   * Primary Navy (PMS 289 C / 282 C): `#081E3F` (`--augie-navy`)
-   * Primary Gold (PMS 109 C): `#FED102` (`--augie-gold`)
-   * Secondary Light Blue: `#8D9EBC`, Green: `#789D4A`
-   * *(Never use Augustana Rock Island colors!)*
+1. **Official Augustana University (Sioux Falls, SD) Brand Palette (Brand Guidelines pp. 17–19):**
+   * Primary Blue / Navy (`PMS 282`, CMYK `100/82/10/64`, RGB `9/31/64`): `#081E3F` (`--augie-navy`)
+   * Primary Yellow / Gold (`PMS 109`, CMYK `0/10/100/0`, RGB `255/209/0`): `#FED102` (`--augie-gold`)
+   * Secondary Light Blue (`PMS 535`, RGB `141/158/188`): `#8D9EBC`
+   * Accent Green (`PMS 576`): `#789D4A`, Accent Orange (`PMS 124`): `#EAAA00`, Light Gray (`PMS Cool Gray 3`): `#C8C9C7`, Dark Gray (`PMS Cool Gray 9`): `#A7A8A9`, Brown (`PMS 466`): `#C6AA76`
+   * *(Never use Augustana Rock Island colors, and follow Page 19 & Page 26 logo color-break rules!)*
 2. **Blind & Screen-Reader Users (WCAG 2.2 AA/AAA):**
    * Every `DataTable` component in `docs/views/default-views.js` MUST define `a11yCaption`, `a11ySummary`, and `rowHeaderKey`.
 3. **Visually Impaired & Color-Blind Users:**

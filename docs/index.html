@@ -64,10 +64,9 @@
     <header class="augie-header">
       <div class="augie-header-inner">
         <div class="augie-brand">
-          <div class="augie-crest" aria-hidden="true">
-            <span class="augie-crest-main">AU</span>
-            <span class="augie-crest-sub">1860 · SD</span>
-          </div>
+          <a href="https://www.augie.edu" target="_blank" rel="noopener noreferrer" class="augie-logo-link" aria-label="Augustana University (Sioux Falls, South Dakota) Home">
+            <img src="./assets/augustana-university-logo.png" alt="Augustana University (Sioux Falls, SD) Official Logo — PMS 109 Yellow and White on PMS 282 Navy" class="augie-official-logo" width="152" height="77" />
+          </a>
           <div>
             <h1 class="augie-title">Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA)</h1>
             <p class="augie-subtitle">
@@ -82,6 +81,10 @@
             <span>🤖</span>
             <span>Copy Prompt for Any Coding Agent</span>
           </button>
+          <a href="https://github.com/pjfolliard/augie-aaa-a2ui-hackathon" target="_blank" rel="noopener noreferrer" class="btn-header-ghost">
+            <span>🐙</span>
+            <span>GitHub Repo</span>
+          </a>
           <a href="https://docs.google.com/spreadsheets/d/1V_U0lXWP40WdDWyacq8QM_emvrwOKWCsPOZzZnWLooo/edit?gid=917434374#gid=917434374" target="_blank" rel="noopener noreferrer" class="btn-header-ghost">
             <span>📊</span>
             <span>Open AAA Persona Google Sheet</span>
@@ -172,6 +175,14 @@
                 <span>2-Hour Hackathon &amp; Google CLI Guide</span>
               </button>
             </div>
+            <div class="layout-switcher-group" role="group" aria-label="A2UI Surface Layout Architecture">
+              <label for="sel-layout-mode" class="layout-switcher-label">📐 A2UI Layout:</label>
+              <select id="sel-layout-mode" class="a2ui-layout-select" aria-label="A2UI Surface Layout Pattern">
+                <option value="inverted-pyramid">Inverted Pyramid (Alert → KPIs → Table → Action)</option>
+                <option value="split-dashboard">Split Action Dashboard (Table + Side-by-Side Cards)</option>
+                <option value="table-first">Table-First Focus (Roster Top → KPIs &amp; Actions Below)</option>
+              </select>
+            </div>
           </div>
 
           <!-- Pane 1: Live Rendered A2UI Surface -->
@@ -209,10 +220,15 @@
 
           <!-- Pane 5: 2-Hour Hackathon Runbook & Trusted Open-Source Google CLI Toolchain -->
           <div id="pane-hackathon-guide" class="builder-panel" hidden>
-            <h3 style="margin-top:0; color:var(--augie-navy);">⏱️ 2-Hour Design-Build Hackathon Agenda (Pete &amp; Terence Sprint + Campus Template)</h3>
+            <h3 style="margin-top:0; color:var(--augie-navy);">⏱️ 2-Hour Design-Build Hackathon Directions (Pete &amp; Terence Sprint + Campus Template)</h3>
             <p style="font-size:0.9rem; color:var(--text-secondary);">
-              This hackathon focuses on <strong>interface &amp; table design</strong>—defining what each of the 10 Augustana personas needs to see and act on when asking their 10 questions, using hypothetical fields today and ready for <strong>Zion Cloud Solutions'</strong> official field list tonight/tomorrow.
+              This hackathon uses an <strong>AI-First Baseline ("Edit, Don't Invent from Scratch")</strong>—starting with AI-curated best-practice layouts and tables across all <strong>10 Personas × 10 Questions = 100 Views</strong>, backed by our built-in agent skill (<code>.agents/skills/augie-a2ui-design/SKILL.md</code>) and ready for <strong>Zion Cloud Solutions'</strong> official field list tonight/tomorrow.
             </p>
+            <div style="display:flex; flex-wrap:wrap; gap:0.65rem; margin-bottom:1.15rem;">
+              <a href="https://github.com/pjfolliard/augie-aaa-a2ui-hackathon" target="_blank" rel="noopener noreferrer" class="btn-augie-primary">🐙 Open GitHub Repository (pjfolliard/augie-aaa-a2ui-hackathon)</a>
+              <a href="https://pjfolliard.github.io/augie-aaa-a2ui-hackathon/" target="_blank" rel="noopener noreferrer" class="btn-augie-outline">🌐 Open Live GitHub Pages Workbench</a>
+              <a href="https://issuu.com/augustanacollegesd/docs/augustana_university_brand_guidelines_requiremen" target="_blank" rel="noopener noreferrer" class="btn-augie-outline">📘 Augustana Brand Guidelines (PMS 282 &amp; 109)</a>
+            </div>
 
             <div class="a2ui-table-scroll" style="margin-bottom:1.5rem;">
               <table class="a2ui-table">
@@ -249,6 +265,49 @@
                     <th scope="row">1:50 – 2:00 (10m)</th>
                     <td><strong>5. Export &amp; Zion Cloud Solutions Prep</strong></td>
                     <td>Download or commit finalized A2UI JSON schemas to GitHub so they map directly to the incoming <strong>Zion Cloud Solutions</strong> field dictionary.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3 style="color:var(--augie-navy);">📐 Zion Cloud Solutions Spec: A2UI v0.9 in Gemini Enterprise (“What You Can and Can't Do”)</h3>
+            <p style="font-size:0.88rem; color:var(--text-secondary);">
+              Incorporated directly from <strong>Zion Cloud Solutions'</strong> Gemini Enterprise A2UI v0.9 engineering briefing (<code>version: "v0.9"</code>, official 69-component composite catalog <code>gemini_enterprise_composite_catalog.json</code>, and A2A v0.3 on Cloud Run):
+            </p>
+            <div style="margin:0.85rem 0 1.25rem; background:#ffffff; border:1.5px solid var(--border-subtle); border-radius:12px; padding:0.85rem; text-align:center;">
+              <img src="./assets/a2ui-v09-lifecycle.png" alt="A2UI v0.9 Lifecycle Diagram from Zion Cloud Solutions: Four messages out (createSurface, updateComponents, updateDataModel, deleteSurface) and one action message back, plus one card's component tree" style="max-width:100%; height:auto; border-radius:8px;" />
+            </div>
+
+            <div class="a2ui-table-scroll" style="margin-bottom:1.5rem;">
+              <table class="a2ui-table">
+                <caption>Zion Cloud Solutions — Gemini Enterprise A2UI v0.9 Guardrails &amp; Architecture Checklist</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Dimension</th>
+                    <th scope="col">What You Can Do (Supported in v0.9)</th>
+                    <th scope="col">What You Can't Do / Must Avoid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Protocol &amp; Catalog</th>
+                    <td>Use <code>"version": "v0.9"</code> on every message and declare <code>https://www.gstatic.com/vertexaisearch/a2ui/v0_9/gemini_enterprise_composite_catalog.json</code> (69 components across Basic, Material, and <code>Canvas</code>).</td>
+                    <td>Do <strong>not</strong> use A2UI <code>v0.9.1</code> or invent custom component types outside the composite catalog.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Hosting &amp; A2A Version</th>
+                    <td>Host as an <strong>A2A v0.3 agent on Google Cloud Run</strong> (grant <code>roles/run.invoker</code> to Discovery Engine service agent on <code>.run.app</code>, or OAuth behind custom domain/LB/Apigee).</td>
+                    <td>Cannot host an A2UI agent on Vertex AI Agent Engine, and cannot use API keys or custom HTTP headers.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Security &amp; Form Actions</th>
+                    <td>Call <strong>Google Cloud Model Armor</strong> directly inside the agent and re-validate all incoming <code>action</code> form payloads server-side.</td>
+                    <td>Gemini Enterprise's built-in Model Armor does not cover A2A agents automatically; client form payloads can be tampered with.</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">File Exports &amp; Rich Media</th>
+                    <td>Send downloadable files (PDF degree audits, SAP CSV exports) as <strong>A2A file parts</strong>; use <code>Image</code>/<code>MaterialImage</code> and <code>MaterialButton</code> with <code>openUrl</code>.</td>
+                    <td>Files saved with ADK's <code>save_artifact</code> do not reach Gemini Enterprise; markdown links/images inside <code>Text</code> do not render.</td>
                   </tr>
                 </tbody>
               </table>
@@ -340,6 +399,7 @@
     <!-- Scripts -->
     <script src="./views/personas-data.js"></script>
     <script src="./views/default-views.js"></script>
+    <script src="./views/question-views.js"></script>
     <script src="./a2ui-renderer.js"></script>
     <script src="./app.js"></script>
   </body>
