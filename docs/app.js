@@ -12,7 +12,7 @@
   const customViews = {};
   personas.forEach((p) => {
     const saved = sessionStorage.getItem(`augie_a2ui_view_${p.id}`);
-    if (saved) {
+    if (saved && p.id !== "student") {
       try {
         customViews[p.id] = JSON.parse(saved);
         return;
@@ -22,6 +22,11 @@
     }
     customViews[p.id] = JSON.parse(JSON.stringify(baseViews[p.id] || {}));
   });
+  // Clear any stale cached student_q1 view so the latest Q1 Both/And + Calendar build always renders fresh
+  try {
+    sessionStorage.removeItem("augie_a2ui_view_student");
+    sessionStorage.removeItem("augie_a2ui_view_student_q1");
+  } catch (e) {}
 
   const PERSONA_RECOMMENDED_LAYOUT = {
     admin: "inverted-pyramid",
@@ -102,7 +107,7 @@
     const toast = document.getElementById("workbench-toast");
     if (!toast) return;
     toast.innerHTML = `
-      <div style="font-weight:800; margin-bottom:0.25rem; color:var(--augie-gold);">⚡ ${title}</div>
+      <div style="font-weight:800; margin-bottom:0.25rem; color:var(--augie-gold);">${title}</div>
       <div style="font-size:0.86rem;">${detail}</div>
     `;
     toast.hidden = false;
@@ -127,7 +132,6 @@
             aria-selected="${isSel ? "true" : "false"}"
             data-persona-id="${p.id}"
           >
-            <span class="persona-pill-icon" aria-hidden="true">${p.icon || "👤"}</span>
             <span class="persona-pill-meta">
               <span class="persona-pill-role">${p.order}. ${p.role}</span>
               <span class="persona-pill-scope">${p.advisingScope}</span>
@@ -165,9 +169,9 @@
     const rosterEl = document.getElementById("sidebar-persona-roster");
     const qListEl = document.getElementById("sidebar-questions-list");
 
-    if (titleEl) titleEl.innerHTML = `<span aria-hidden="true">${p.icon}</span> <span>${p.role}</span>`;
+    if (titleEl) titleEl.innerHTML = `<span>${p.role}</span>`;
     if (scopeEl) scopeEl.textContent = `Advising Scope: ${p.advisingScope}`;
-    if (unitEl) unitEl.textContent = `${p.defaultUnit} · Google Group: ${p.googleGroupId}`;
+    if (unitEl) unitEl.innerHTML = `${p.defaultUnit}<br>Google Group: ${p.googleGroupId}`;
     if (promptEl) promptEl.textContent = p.systemPrompt;
 
     if (rosterEl) {
@@ -268,6 +272,374 @@
         renderMainSurface();
       },
       onAction: (evt) => {
+        if (evt.type === "prioritySliceChange") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          dataModel.activePriorityMode = evt.modeId;
+          const slots = Array.isArray(dataModel.contestableSlots) ? dataModel.contestableSlots : [];
+          const slot1300 = slots.find((s) => s.slotId === "13:00");
+          const slot0930 = slots.find((s) => s.slotId === "09:30");
+
+          if (evt.modeId === "heavy_major_minor") {
+            if (slot1300) slot1300.selectedValue = "DATA 340";
+            if (slot0930) slot0930.selectedValue = "MATH 310";
+            dataModel.scheduleSummary = {
+              sliceLabel: "Option 2: Heavy Major & Minor Push + Parallel SOPHIA",
+              totalCredits: "15 Credits (4 Courses)",
+              f1Status: "15 Credits (Meets 12-Credit Full-Time Minimum)"
+            };
+            dataModel.calendarEvents = [
+              {
+                slotId: "09:30",
+                days: "TR",
+                course: "MATH 310",
+                title: "Linear Algebra",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "10:00",
+                days: "MWF",
+                course: "COSC 450",
+                title: "Data Science Senior Capstone",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "13:00",
+                days: "MWF",
+                course: "DATA 340",
+                title: "Applied Machine Learning",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "13:30",
+                days: "TR",
+                course: "RELI 218",
+                title: "Global Christianities",
+                bucket: "SOPHIA"
+              }
+            ];
+          } else if (evt.modeId === "sophia_electives_mix") {
+            if (slot1300) slot1300.selectedValue = "ART 140";
+            if (slot0930) slot0930.selectedValue = "COSC 315";
+            dataModel.scheduleSummary = {
+              sliceLabel: "Option 3: Finish Remaining SOPHIA + Studio & Career Electives",
+              totalCredits: "14 Credits (4 Courses)",
+              f1Status: "14 Credits (Meets 12-Credit Full-Time Minimum)"
+            };
+            dataModel.calendarEvents = [
+              {
+                slotId: "09:30",
+                days: "TR",
+                course: "COSC 315",
+                title: "Accessible Human-Computer Interaction",
+                bucket: "Elective"
+              },
+              {
+                slotId: "10:00",
+                days: "MWF",
+                course: "COSC 450",
+                title: "Data Science Senior Capstone",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "13:00",
+                days: "MWF",
+                course: "ART 140",
+                title: "Studio Ceramics",
+                bucket: "Elective"
+              },
+              {
+                slotId: "13:30",
+                days: "TR",
+                course: "RELI 218",
+                title: "Global Christianities",
+                bucket: "SOPHIA"
+              }
+            ];
+          } else {
+            if (slot1300) slot1300.selectedValue = "DATA 340";
+            if (slot0930) slot0930.selectedValue = "COSC 315";
+            dataModel.scheduleSummary = {
+              sliceLabel: "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective",
+              totalCredits: "14 Credits (4 Courses)",
+              f1Status: "14 Credits (Meets 12-Credit Full-Time Minimum)"
+            };
+            dataModel.calendarEvents = [
+              {
+                slotId: "09:30",
+                days: "TR",
+                course: "COSC 315",
+                title: "Accessible Human-Computer Interaction",
+                bucket: "Elective"
+              },
+              {
+                slotId: "10:00",
+                days: "MWF",
+                course: "COSC 450",
+                title: "Data Science Senior Capstone",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "13:00",
+                days: "MWF",
+                course: "DATA 340",
+                title: "Applied Machine Learning",
+                bucket: "Major Core"
+              },
+              {
+                slotId: "13:30",
+                days: "TR",
+                course: "RELI 218",
+                title: "Global Christianities",
+                bucket: "SOPHIA"
+              }
+            ];
+          }
+
+          saveActivePayload(payload);
+          renderMainSurface();
+          renderJsonEditor();
+          showToast(
+            `Updated Semester Mix`,
+            `Step 1 Pillars, Step 2 Dropdowns, and Step 3 Calendar updated.`
+          );
+          return;
+        }
+
+        if (evt.type === "slotDropdownChange") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          const slots = Array.isArray(dataModel.contestableSlots) ? dataModel.contestableSlots : [];
+          const targetSlot = slots.find((s) => s.slotId === evt.slotId);
+          if (targetSlot) {
+            targetSlot.selectedValue = evt.chosenCourse;
+            const chosenOpt = (targetSlot.options || []).find((o) => o.value === evt.chosenCourse);
+            const events = Array.isArray(dataModel.calendarEvents) ? dataModel.calendarEvents : [];
+            const calEv = events.find((e) => e.slotId === evt.slotId);
+            if (calEv && chosenOpt) {
+              calEv.course = chosenOpt.course;
+              calEv.title = chosenOpt.title;
+              calEv.bucket = chosenOpt.bucket;
+            }
+          }
+          saveActivePayload(payload);
+          renderMainSurface();
+          renderJsonEditor();
+          showToast(
+            `Updated Time Slot (${evt.chosenCourse})`,
+            `Updated downstream trade-off and Step 3 Monday–Friday Calendar.`
+          );
+          return;
+        }
+
+        if (evt.type === "inspectCourse") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          const detailsMap = dataModel.courseCatalogDetails || {};
+          const info = detailsMap[evt.courseCode];
+          const drawer = document.getElementById("course-detail-drawer");
+          const titleEl = document.getElementById("course-drawer-title");
+          const bodyEl = document.getElementById("course-drawer-body");
+          if (drawer && titleEl && bodyEl && info) {
+            titleEl.textContent = `${info.code} — ${info.title}`;
+            bodyEl.innerHTML = `
+              <div class="course-drawer-meta-grid">
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Curriculum Pillar</span>
+                  <strong>${info.pillar}</strong>
+                </div>
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Credits</span>
+                  <strong>${info.credits}</strong>
+                </div>
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Instructor</span>
+                  <strong>${info.instructor}</strong>
+                </div>
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Meeting Time & Room</span>
+                  <strong>${info.schedule}</strong>
+                </div>
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Live J1 Seat Availability</span>
+                  <strong>${info.seats}</strong>
+                </div>
+                <div class="course-drawer-meta-item">
+                  <span class="course-drawer-meta-label">Prerequisites</span>
+                  <strong>${info.prerequisites}</strong>
+                </div>
+              </div>
+
+              <div class="course-drawer-section">
+                <h4>Course Catalog Description</h4>
+                <p>${info.description}</p>
+              </div>
+
+              <div class="course-drawer-section">
+                <h4>Spring 2027 Syllabus Outline</h4>
+                <ul class="course-drawer-syllabus-list">
+                  ${(info.syllabusOutline || []).map((item) => `<li>${item}</li>`).join("")}
+                </ul>
+              </div>
+
+              <div class="course-drawer-actions">
+                <a href="${info.syllabusUrl}" target="_blank" rel="noopener" class="btn-augie-primary" id="btn-open-syllabus-doc">
+                  Open / Download ${info.code} Syllabus (PDF Preview)
+                </a>
+              </div>
+            `;
+            drawer.hidden = false;
+            const openBtn = document.getElementById("btn-open-syllabus-doc");
+            openBtn?.addEventListener("click", (e) => {
+              e.preventDefault();
+              const syllabusHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>${info.code} — ${info.title} Syllabus (Spring 2027)</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #081E3F; max-width: 760px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.6; }
+    header { border-bottom: 4px solid #FED102; background: #081E3F; color: #fff; padding: 1.25rem 1.5rem; border-radius: 8px; }
+    h1 { margin: 0 0 0.35rem; font-size: 1.35rem; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; background: #f8fafc; border: 1px solid #cbd5e1; padding: 1rem; border-radius: 8px; margin: 1.25rem 0; font-size: 0.92rem; }
+    h2 { color: #081E3F; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3rem; margin-top: 1.5rem; font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color:#FED102; font-weight:700;">Augustana University — Sioux Falls, SD</div>
+    <h1>${info.code}: ${info.title} (${info.credits})</h1>
+    <div>Spring 2027 Official Course Syllabus</div>
+  </header>
+  <div class="meta">
+    <div><strong>Instructor:</strong> ${info.instructor}</div>
+    <div><strong>Meeting Time & Location:</strong> ${info.schedule}</div>
+    <div><strong>Curriculum Requirement:</strong> ${info.pillar}</div>
+    <div><strong>Prerequisites:</strong> ${info.prerequisites}</div>
+  </div>
+  <h2>Course Description</h2>
+  <p>${info.description}</p>
+  <h2>Spring 2027 Weekly Module Outline</h2>
+  <ul>
+    ${(info.syllabusOutline || []).map((item) => `<li>${item}</li>`).join("")}
+  </ul>
+</body>
+</html>`;
+              const blob = new Blob([syllabusHtml], { type: "text/html" });
+              const url = URL.createObjectURL(blob);
+              window.open(url, "_blank");
+            });
+            announcePolite(`Opened course detail side panel for ${info.code}: ${info.title}.`);
+          } else {
+            showToast(`Course Details: ${evt.courseCode}`, `No extended catalog record found for ${evt.courseCode}.`);
+          }
+          return;
+        }
+
+        if (evt.type === "exportSchedule") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          const summary = dataModel.scheduleSummary || {};
+          const events = Array.isArray(dataModel.calendarEvents) ? dataModel.calendarEvents : [];
+          const slots = Array.isArray(dataModel.contestableSlots) ? dataModel.contestableSlots : [];
+          const detailsMap = dataModel.courseCatalogDetails || {};
+
+          if (evt.exportAction === "download_plan") {
+            const planHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Spring 2027 Advising & Registration Plan — Amina Tesfaye</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #081E3F; max-width: 820px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.55; }
+    .banner { background: #081E3F; color: #ffffff; border-bottom: 5px solid #FED102; padding: 1.25rem 1.5rem; border-radius: 8px; }
+    .banner h1 { margin: 0.2rem 0; font-size: 1.4rem; }
+    .meta-bar { display: flex; flex-wrap: wrap; gap: 1.25rem; background: #f8fafc; border: 1px solid #cbd5e1; padding: 0.9rem 1.2rem; border-radius: 8px; margin: 1.2rem 0; font-size: 0.92rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.65rem 0.8rem; text-align: left; font-size: 0.9rem; }
+    th { background: #081E3F; color: #ffffff; }
+    .sig-box { margin-top: 2rem; padding: 1rem 1.2rem; border: 1.5px dashed #081E3F; border-radius: 8px; background: #fffbeb; }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:#FED102; font-weight:700;">Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA)</div>
+    <h1>Spring 2027 Registration Plan — Amina Tesfaye</h1>
+    <div>Prepared for Faculty Advising Session & Registration Approval with Dr. Matthewulat</div>
+  </div>
+  <div class="meta-bar">
+    <div><strong>Chosen Mix:</strong> ${summary.sliceLabel || "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective"}</div>
+    <div><strong>Total Load:</strong> ${summary.totalCredits || "14 Credits (4 Courses)"}</div>
+    <div><strong>F-1 Status:</strong> ${summary.f1Status || "Meets 12-Credit Full-Time Minimum"}</div>
+  </div>
+  <h2>Proposed Monday–Friday Course Schedule</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Course Code</th>
+        <th>Course Name</th>
+        <th>Days & Time</th>
+        <th>Curriculum Pillar</th>
+        <th>Instructor</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${events
+        .map((e) => {
+          const d = detailsMap[e.course] || {};
+          return `<tr>
+            <td><strong>${e.course}</strong></td>
+            <td>${e.title}</td>
+            <td>${d.schedule || `${e.days} ${e.slotId}`}</td>
+            <td>${d.pillar || e.bucket}</td>
+            <td>${d.instructor || "Staff"}</td>
+          </tr>`;
+        })
+        .join("")}
+    </tbody>
+  </table>
+  <h2>Time-Slot Conflict Resolutions & Downstream Notes</h2>
+  <ul>
+    ${slots
+      .map((s) => {
+        const chosen = (s.options || []).find((o) => o.value === s.selectedValue) || (s.options || [])[0];
+        return `<li><strong>${s.timeLabel}:</strong> Selected <strong>${chosen ? `${chosen.course} (${chosen.title})` : s.selectedValue}</strong> — ${chosen ? chosen.impact : ""}</li>`;
+      })
+      .join("")}
+  </ul>
+  <div class="sig-box">
+    <strong>Faculty Advisor Registration Clearance (Dr. Matthewulat):</strong>
+    <p style="margin:0.4rem 0 0;">Advisor Signature / Approval Stamp: _____________________________________ &nbsp;&nbsp; Date: _______________</p>
+  </div>
+</body>
+</html>`;
+            const blob = new Blob([planHtml], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.html";
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(
+              "Advising Plan Soft Copy Exported",
+              "Downloaded Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.html for your advising session."
+            );
+          } else if (evt.exportAction === "email_advisor") {
+            const courseLines = events
+              .map((e) => {
+                const d = detailsMap[e.course] || {};
+                return `- ${e.course}: ${e.title} (${d.schedule || `${e.days} ${e.slotId}`})`;
+              })
+              .join("\n");
+            const subject = encodeURIComponent("Spring 2027 Registration Plan Approval Request — Amina Tesfaye");
+            const body = encodeURIComponent(
+              `Dear Dr. Matthewulat,\n\nI have reviewed my Spring 2027 degree progress, SOPHIA requirements, and time-slot trade-offs in the Augustana Academic Advising Agent. Here is my proposed Spring 2027 schedule for your registration approval:\n\nSelected Mix: ${summary.sliceLabel || "Option 1"}\nTotal Load: ${summary.totalCredits || "14 Credits"}\n\nProposed Courses:\n${courseLines}\n\nPlease let me know if you approve this plan for registration or if we should adjust any sections during our advising session.\n\nThank you,\nAmina Tesfaye`
+            );
+            window.location.href = `mailto:m.matthewulat@augie.edu?subject=${subject}&body=${body}`;
+            showToast(
+              "Email Draft Prepared for Dr. Matthewulat",
+              "Opened email client with your Spring 2027 schedule requesting registration approval."
+            );
+          }
+          return;
+        }
+
         if (evt.type === "rowAction") {
           // Live in-place A2UI dataModelUpdate simulation when a row action is clicked
           const table = getPrimaryDataTableComponent(payload);
@@ -746,6 +1118,20 @@
       if (zionModal) zionModal.hidden = true;
       renderAll();
       showToast("Zion Cloud Solutions Mappings Updated!", "Updated field mappings across the workbench.");
+    });
+
+    // Course Detail & Syllabus Drawer (Canvas Side Panel)
+    const courseDrawer = document.getElementById("course-detail-drawer");
+    document.getElementById("btn-close-course-drawer")?.addEventListener("click", () => {
+      if (courseDrawer) courseDrawer.hidden = true;
+    });
+    document.getElementById("course-drawer-backdrop")?.addEventListener("click", () => {
+      if (courseDrawer) courseDrawer.hidden = true;
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && courseDrawer && !courseDrawer.hidden) {
+        courseDrawer.hidden = true;
+      }
     });
   }
 

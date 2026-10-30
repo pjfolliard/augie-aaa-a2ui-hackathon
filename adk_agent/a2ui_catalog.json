@@ -173,6 +173,52 @@
         "submitLabel": { "type": "string" },
         "actionName": { "type": "string" }
       }
+    },
+    "PriorityTradeoffExplorer": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialTabs + MaterialChips + MaterialBadge",
+      "description": "Liberal Arts Agency & Priority Slicer allowing students to choose how to weight Major/Minor Core, SOPHIA Gen-Ed, and Electives while listing recommended courses per pillar horizontally.",
+      "required": ["title", "modesPath", "bucketsPath"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "activeModePath": { "type": "string" },
+        "modesPath": { "type": "string" },
+        "bucketsPath": { "type": "string" }
+      }
+    },
+    "CourseConflictConfigurator": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialSelect + MaterialText",
+      "description": "Clean dropdown-based course & time-slot selector that lets students swap contested courses (e.g., Major vs. Elective) via native select menus and view plain-text downstream trade-offs.",
+      "required": ["title", "slotsPath"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "slotsPath": { "type": "string" }
+      }
+    },
+    "WeeklyScheduleCalendar": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialGridList + MaterialBadge + MaterialButton",
+      "description": "Accessible Monday-through-Friday visual calendar grid and converged course schedule summary with live J1 conflict detection (/students/me/schedule-conflicts) and F-1 12-credit full-time guardrails.",
+      "required": ["title", "eventsPath", "summaryPath"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "eventsPath": { "type": "string" },
+        "summaryPath": { "type": "string" }
+      }
+    },
+    "ScheduleExportCard": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialButton",
+      "description": "One-click export and advisor email approval bar that generates a soft-copy advising plan or opens an email to the assigned advisor without redundant dropdown forms.",
+      "required": ["title", "advisorEmail", "advisorName"],
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "advisorName": { "type": "string" },
+        "advisorEmail": { "type": "string" },
+        "exportButtonLabel": { "type": "string" },
+        "emailButtonLabel": { "type": "string" }
+      }
     }
   }
 }

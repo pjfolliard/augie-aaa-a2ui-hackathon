@@ -131,6 +131,17 @@
         priorityCols: ["unit_name", "sap_compliance", "systemic_holds", "retention_rate"],
         extraCol: { key: "sap_export_ready", label: "Federal Export Package", zionField: "J1: /gpa + degree_rules.degree.cum_gpa_ok", type: "badge", jargon: "SAP", values: ["✓ Ready (CSV/JSON)", "⚠ 19 Plans Pending", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)", "✓ Ready (CSV/JSON)"] }
       }
+    },
+    student: {
+      1: {
+        layout: "inverted-pyramid",
+        alertSeverity: "info",
+        alertIcon: "",
+        alertTitle: "Spring 2027 Advising Plan: Choose Your Mix, Customize Time-Slot Conflicts, and Review Your Schedule",
+        alertMsg: "At Augustana, your Major, Minor, SOPHIA Core, and Electives advance together. Select a semester mix in Step 1 to see the recommended courses in each pillar, use the dropdowns in Step 2 to resolve any time-slot conflicts, and view your Monday-Friday schedule in Step 3.",
+        tableTitle: "Reference: Full Course Details & Jenzabar J1 Section Metadata [J1 /recommend-next-term + /catalog/sections]",
+        priorityCols: ["course_code", "pillar", "credits", "meeting_window", "seats_left", "downstream_tradeoff"]
+      }
     }
   };
 

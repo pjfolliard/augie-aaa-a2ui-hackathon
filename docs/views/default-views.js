@@ -983,8 +983,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "root-layout",
           component: {
             Column: {
-              a11yLabel: "Student Self-Service Accessible Degree & Schedule Planner Surface",
-              children: { explicitList: ["alert-banner", "kpi-row", "degree-progress", "main-table", "action-card"] }
+              a11yLabel: "Student Self-Service Liberal Arts Priority Funnel, Dropdown Conflict Selector & Mon-Fri Schedule Builder",
+              children: {
+                explicitList: [
+                  "alert-banner",
+                  "kpi-row",
+                  "priority-explorer",
+                  "conflict-configurator",
+                  "weekly-calendar",
+                  "degree-progress",
+                  "action-card",
+                  "main-table"
+                ]
+              }
             }
           }
         },
@@ -993,9 +1004,9 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           component: {
             AlertBanner: {
               severity: "info",
-              icon: "⚡",
-              title: "Welcome, Amina! You Are On Track for Four-Year Graduation (May 2027) — 1 Prerequisite Override Pending",
-              message: "Important F-1 International Student Reminder: You are currently enrolled in 14 credits. Dropping a 3- or 4-credit course this semester would place you at 10–11 credits (below the mandatory 12-credit full-time F-1 visa minimum). Always consult your advisor & IPO before dropping a class!",
+              icon: "",
+              title: "Spring 2027 Advising Plan: Choose Your Mix, Customize Time-Slot Conflicts, and Review Your Schedule",
+              message: "At Augustana, your Major, Minor, SOPHIA Core, and Electives advance together. Select a semester mix in Step 1 to see the recommended courses in each pillar, use the dropdowns in Step 2 to resolve any time-slot conflicts, and view your Monday-Friday schedule in Step 3.",
               jargonTerms: ["SOPHIA", "F-1 Full-Time Load", "Prerequisite Override", "Hold"]
             }
           }
@@ -1004,8 +1015,41 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "kpi-row",
           component: {
             KPIStatRow: {
-              a11yLabel: "My Personal Degree Progress Snapshot",
+              a11yLabel: "My Spring 2027 Schedule & Degree Trajectory Snapshot",
               itemsPath: "/kpis"
+            }
+          }
+        },
+        {
+          id: "priority-explorer",
+          component: {
+            PriorityTradeoffExplorer: {
+              title: "Step 1: Choose Your 'Both/And' Semester Mix",
+              subtitle: "Every mix advances your Major, SOPHIA Core, and Liberal Arts goals together. Click any option below to see the exact courses recommended in each pillar.",
+              activeModePath: "/activePriorityMode",
+              modesPath: "/priorityModes",
+              bucketsPath: "/degreeBuckets"
+            }
+          }
+        },
+        {
+          id: "conflict-configurator",
+          component: {
+            CourseConflictConfigurator: {
+              title: "Step 2: Customize Contested Time Slots & Review Trade-Offs",
+              subtitle: "Two time slots have competing courses across your Major, Minor, and Electives. Use the dropdown menus to choose which course you want in each slot and see the downstream impact.",
+              slotsPath: "/contestableSlots"
+            }
+          }
+        },
+        {
+          id: "weekly-calendar",
+          component: {
+            WeeklyScheduleCalendar: {
+              title: "Step 3: Your Monday–Friday Class Schedule",
+              subtitle: "Your converged Monday–Friday schedule showing Course Number and Course Name.",
+              eventsPath: "/calendarEvents",
+              summaryPath: "/scheduleSummary"
             }
           }
         },
@@ -1013,9 +1057,22 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "degree-progress",
           component: {
             DegreeProgressCard: {
-              title: "My Four-Year Graduation & SOPHIA Progress (Self Only Scope)",
-              subtitle: "Expected Graduation: May 2027 · Assigned Advisor: Dr. Matthewulat (m.matthewulat@augie.edu · Madsen Center 214)",
+              title: "How This Mix Advances All Your Goals in Parallel",
+              subtitle: "Projected Progress After Spring 2027 · Assigned Advisor: Dr. Matthewulat (Madsen Center 214)",
               itemsPath: "/myProgress"
+            }
+          }
+        },
+        {
+          id: "action-card",
+          component: {
+            ScheduleExportCard: {
+              title: "Export Advising Plan or Email Advisor for Registration Approval",
+              description: "Download a clean soft copy of your Spring 2027 schedule and trade-off summary to bring to your advising session, or email it directly to Dr. Matthewulat to request registration approval.",
+              advisorName: "Dr. Matthewulat",
+              advisorEmail: "m.matthewulat@augie.edu",
+              exportButtonLabel: "Export Advising Plan (Soft Copy for Advising Session)",
+              emailButtonLabel: "Email Plan to Dr. Matthewulat for Registration Approval"
             }
           }
         },
@@ -1023,38 +1080,19 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "main-table",
           component: {
             DataTable: {
-              title: "Recommended Next-Semester Courses & Remaining Degree Requirements [Zion J1PRD Connector API v1.0]",
-              a11yCaption: "Your personalized course plan for next semester showing course code, title, credits, which requirement it fulfills, prerequisite status, and accessible format availability.",
-              a11ySummary: "Lists recommended courses for your next semester at Augustana University with plain-language requirement tags.",
+              title: "Reference: Full Course Details & Jenzabar J1 Section Metadata [J1 /recommend-next-term + /catalog/sections]",
+              a11yCaption: "Complete reference list of candidate courses for Spring 2027 showing course number, curriculum pillar, meeting time, open seats, and graduation impact.",
+              a11ySummary: "Reference table of all candidate courses considered in Steps 1, 2, and 3.",
               rowHeaderKey: "course_code",
               rowsPath: "/recommendedCourses",
               columns: [
-                { key: "course_code", label: "Course Code & Title", zionField: "J1: crs_cde / items[].code", sortable: true },
-                { key: "credits", label: "Credits", zionField: "J1: credit_hrs / registered_credits", sortable: true },
-                { key: "fulfills_req", label: "Fulfills Requirement", zionField: "J1: open_requirements[].requirement", type: "badge", jargon: "SOPHIA", sortable: true },
-                { key: "prereq_status", label: "Prerequisite & Eligibility", zionField: "J1: course-eligibility.status + missing[]", type: "badge", jargon: "Prerequisite Override", sortable: true },
-                { key: "schedule_modality", label: "Schedule & Accessible Format", zionField: "J1: meetings[].building + days", sortable: true },
-                { key: "grad_impact", label: "Impact If Delayed / Dropped", zionField: "J1: incomplete_requirements[]", jargon: "F-1 Full-Time Load", sortable: true }
-              ],
-              rowActions: [
-                { id: "add-plan", label: "Add to Spring Schedule Plan", icon: "➕" },
-                { id: "ask-advisor", label: "Ask Advisor About This Class", icon: "💬" }
+                { key: "course_code", label: "Course Number & Name", zionField: "J1: items[].code + title", sortable: true },
+                { key: "pillar", label: "Curriculum Pillar", zionField: "J1: items[].satisfies", sortable: true },
+                { key: "credits", label: "Credits", zionField: "J1: credit_hrs", sortable: true },
+                { key: "meeting_window", label: "Meeting Days & Time", zionField: "J1: meetings[].days/begin", sortable: true },
+                { key: "seats_left", label: "Open Seats", zionField: "J1: sections[].seats_left", sortable: true },
+                { key: "downstream_tradeoff", label: "Downstream Note", zionField: "J1: open_requirements[].reason", sortable: true }
               ]
-            }
-          }
-        },
-        {
-          id: "action-card",
-          component: {
-            ActionFormCard: {
-              title: "Connect With My Academic Advisor or Simulate a Major / Drop Decision",
-              description: "Book an accessible appointment with Dr. Matthewulat (in-person, captioned video, or screen-reader friendly chat) or test a 'What-If' scenario.",
-              fields: [
-                { id: "studentGoal", label: "What would you like to do?", type: "select", options: ["Schedule 1-on-1 Advising Appointment with Dr. Matthewulat", "Request Prerequisite Override for COSC 450 Capstone", "What-If Simulation: Add a Mathematics Double Major", "Check Impact of Dropping a Course (Includes F-1 12-Credit Check)"] },
-                { id: "a11yPref", label: "Meeting & Accessibility Preference", type: "select", options: ["In-Person (Madsen Center 214 — Wheelchair & Screen-Reader Ready)", "Google Meet with Live Captions / Transcript Saved to Docs", "Async Written Plan (Screen-Reader Structured HTML + Amharic/English Glossary)"] }
-              ],
-              submitLabel: "Send Request to My Advisor",
-              actionName: "studentAdvisorAction"
             }
           }
         }
@@ -1063,24 +1101,418 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
     dataModelUpdate: {
       surfaceId: "augie-aaa-student-surface",
       contents: {
+        activePriorityMode: "balanced_mix",
         kpis: [
-          { label: "Expected Graduation", value: "May 2027", delta: "✓ On Track (4-Year Plan)", status: "success", icon: "🎓" },
-          { label: "Credits Completed + Enrolled", value: "78 + 14 = 92", delta: "32 Credits Left After This Term", status: "info", icon: "📚" },
-          { label: "Registration Holds", value: "0 Active Holds", delta: "✓ Ready for Nov 12 Window", status: "success", icon: "✓" },
-          { label: "F-1 Full-Time Status", value: "14 Credits", delta: "✓ Above 12-Cr Visa Minimum", status: "success", icon: "🌐" }
+          { label: "Selected Semester Load", value: "14 Credits (4 Courses)", delta: "Meets 12-Credit Full-Time & F-1 Minimum", status: "success", icon: "" },
+          { label: "Contested Time Slots", value: "2 Time Slots", delta: "MWF 1:00 PM & TR 9:30 AM (Customizable Below)", status: "warning", icon: "" },
+          { label: "Parallel SOPHIA Pace", value: "100% SOPHIA Complete", delta: "Finishes Final R2 Requirement This Spring", status: "success", icon: "" },
+          { label: "Registration Window", value: "Nov 12 · 8:00 AM", delta: "0 Active Holds · 1 Prereq Override Ready", status: "info", icon: "" }
         ],
-        myProgress: [
-          { category: "Overall 124-Credit Bachelor's Degree Requirement (78 Earned + 14 Current = 92/124)", percent: 74, status: "✓ 32 Credits Remaining (2 Semesters)" },
-          { category: "Data Science & Computer Science Major Requirements", percent: 80, status: "✓ 3 Core + 1 Elective Left" },
-          { category: "SOPHIA General Education Plan (9 of 10 Categories Complete)", percent: 90, status: "⚠ Only 1 Religion (R2) Course Remaining" },
-          { category: "Transfer Credits Applied (12 Credits from Dual Enrollment)", percent: 100, status: "✓ Covers MATH 151 & ENGL 110 Core" }
+        priorityModes: [
+          {
+            id: "balanced_mix",
+            label: "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective (Recommended — 14 Credits)",
+            summary: "Advances 2 Major Core courses, finishes your final SOPHIA requirement, and includes 1 Career Elective.",
+            severity: "info",
+            tradeoffTitle: "Option 1 Trade-Off Summary:",
+            tradeoffBanner: "Zero schedule conflicts. Keeps you on pace for 400-level AI courses in the Fall while finishing 100% of SOPHIA and adding COSC 315 Accessible HCI."
+          },
+          {
+            id: "heavy_major_minor",
+            label: "Option 2: Heavy Major & Minor Push + Parallel SOPHIA (15 Credits)",
+            summary: "Advances 2 Major Core courses, 1 Mathematics Minor requirement, and finishes your final SOPHIA course.",
+            severity: "info",
+            tradeoffTitle: "Option 2 Trade-Off Summary:",
+            tradeoffBanner: "Completes your Mathematics Minor requirement (MATH 310) a semester early alongside your Major Core and SOPHIA R2, shifting general electives to Senior Year."
+          },
+          {
+            id: "sophia_electives_mix",
+            label: "Option 3: Finish Remaining SOPHIA + Studio & Career Electives (14 Credits)",
+            summary: "Locks your mandatory Spring-only Major Capstone, finishes SOPHIA, and opens room for 2 Electives.",
+            severity: "warning",
+            tradeoffTitle: "Option 3 Trade-Off Summary:",
+            tradeoffBanner: "Lets you take both ART 140 Studio Ceramics and COSC 315 Accessible HCI this spring alongside your Capstone and SOPHIA R2. Downstream effect: DATA 340 shifts to Fall Senior Year."
+          }
+        ],
+        degreeBuckets: [
+          {
+            title: "Pillar 1: Major & Minor Courses",
+            subtitle: "Recommended in Selected Option",
+            coursesByMode: {
+              balanced_mix: [
+                "COSC 450 — Data Science Senior Capstone (4 Credits · MWF 10:00 AM)",
+                "DATA 340 — Applied Machine Learning (4 Credits · MWF 1:00 PM)"
+              ],
+              heavy_major_minor: [
+                "COSC 450 — Data Science Senior Capstone (4 Credits · MWF 10:00 AM)",
+                "DATA 340 — Applied Machine Learning (4 Credits · MWF 1:00 PM)",
+                "MATH 310 — Linear Algebra (4 Credits · TR 9:30 AM · Math Minor)"
+              ],
+              sophia_electives_mix: [
+                "COSC 450 — Data Science Senior Capstone (4 Credits · MWF 10:00 AM)",
+                "(DATA 340 — Applied Machine Learning shifts to Fall 2026)"
+              ]
+            }
+          },
+          {
+            title: "Pillar 2: Parallel SOPHIA Gen-Ed",
+            subtitle: "Recommended in Selected Option",
+            coursesByMode: {
+              balanced_mix: [
+                "RELI 218 — Global Christianities (3 Credits · TR 1:30 PM · Completes Final R2 Requirement)"
+              ],
+              heavy_major_minor: [
+                "RELI 218 — Global Christianities (3 Credits · TR 1:30 PM · Completes Final R2 Requirement)"
+              ],
+              sophia_electives_mix: [
+                "RELI 218 — Global Christianities (3 Credits · TR 1:30 PM · Completes Final R2 Requirement)"
+              ]
+            }
+          },
+          {
+            title: "Pillar 3: Liberal Arts & Career Electives",
+            subtitle: "Recommended in Selected Option",
+            coursesByMode: {
+              balanced_mix: [
+                "COSC 315 — Accessible Human-Computer Interaction (3 Credits · TR 9:30 AM)"
+              ],
+              heavy_major_minor: [
+                "(No general elective this term — TR 9:30 AM slot used for MATH 310 Minor course)"
+              ],
+              sophia_electives_mix: [
+                "ART 140 — Studio Ceramics (4 Credits · MWF 1:00 PM)",
+                "COSC 315 — Accessible Human-Computer Interaction (3 Credits · TR 9:30 AM)"
+              ]
+            }
+          }
+        ],
+        contestableSlots: [
+          {
+            slotId: "13:00",
+            timeLabel: "Mon / Wed / Fri · 1:00 – 1:50 PM (or 2:50 PM Studio)",
+            slotType: "Time Conflict: Major Core vs. Studio Art Elective",
+            pickerLabel: "Choose Course for Mon/Wed/Fri 1:00 PM:",
+            selectedValue: "DATA 340",
+            options: [
+              {
+                value: "DATA 340",
+                course: "DATA 340",
+                title: "Applied Machine Learning",
+                bucket: "Major Core",
+                days: "MWF",
+                label: "DATA 340 — Applied Machine Learning (Major Core · 4 Credits)",
+                tradeoff: "Keeps your AI Major sequence on schedule to unlock 400-level AI electives in Fall 2026. ART 140 Studio Ceramics waits until Senior Year."
+              },
+              {
+                value: "ART 140",
+                course: "ART 140",
+                title: "Studio Ceramics",
+                bucket: "Elective",
+                days: "MWF",
+                label: "ART 140 — Studio Ceramics (Liberal Arts Elective · 4 Credits)",
+                tradeoff: "Prioritizes your Studio Art elective this spring. Downstream effect: DATA 340 moves to Fall 2026 (delays 400-level AI electives by 1 term, but May 2027 graduation stays on track)."
+              }
+            ]
+          },
+          {
+            slotId: "09:30",
+            timeLabel: "Tue / Thu · 9:30 – 10:45 AM",
+            slotType: "Time Conflict: Career Elective vs. Math Minor vs. Music Elective",
+            pickerLabel: "Choose Course for Tue/Thu 9:30 AM:",
+            selectedValue: "COSC 315",
+            options: [
+              {
+                value: "COSC 315",
+                course: "COSC 315",
+                title: "Accessible Human-Computer Interaction",
+                bucket: "Elective",
+                days: "TR",
+                label: "COSC 315 — Accessible Human-Computer Interaction (Elective · 3 Credits)",
+                tradeoff: "Brings your semester load to a balanced 14 credits (above the 12-credit F-1 & full-time minimum) with zero schedule conflicts."
+              },
+              {
+                value: "MATH 310",
+                course: "MATH 310",
+                title: "Linear Algebra",
+                bucket: "Major Core",
+                days: "TR",
+                label: "MATH 310 — Linear Algebra (Mathematics Minor · 4 Credits)",
+                tradeoff: "Completes your Mathematics Minor requirement early and brings your semester load to 15 credits (higher quantitative workload)."
+              },
+              {
+                value: "MUSI 118",
+                course: "MUSI 118",
+                title: "History of Jazz",
+                bucket: "Elective",
+                days: "TR",
+                label: "MUSI 118 — History of Jazz (Liberal Arts Elective · 2 Credits)",
+                tradeoff: "Lighter 2-credit liberal arts elective that keeps your total semester load at 13 credits (still above the 12-credit full-time minimum)."
+              }
+            ]
+          },
+          {
+            slotId: "10:00",
+            timeLabel: "Mon / Wed / Fri · 10:00 – 10:50 AM",
+            slotType: "No Conflict — Mandatory Spring-Only Anchor",
+            pickerLabel: "Locked Anchor Course:",
+            selectedValue: "COSC 450",
+            options: [
+              {
+                value: "COSC 450",
+                course: "COSC 450",
+                title: "Data Science Senior Capstone",
+                bucket: "Major Core",
+                days: "MWF",
+                label: "COSC 450 — Data Science Senior Capstone (Major Capstone · 4 Credits)",
+                tradeoff: "Offered in Spring semesters only. Keeping this course in your schedule protects your May 2027 graduation date."
+              }
+            ]
+          },
+          {
+            slotId: "13:30",
+            timeLabel: "Tue / Thu · 1:30 – 2:45 PM",
+            slotType: "No Conflict — Parallel SOPHIA Requirement",
+            pickerLabel: "Locked SOPHIA Course:",
+            selectedValue: "RELI 218",
+            options: [
+              {
+                value: "RELI 218",
+                course: "RELI 218",
+                title: "Global Christianities",
+                bucket: "SOPHIA",
+                days: "TR",
+                label: "RELI 218 — Global Christianities (SOPHIA R2 · 3 Credits)",
+                tradeoff: "Completes 100% of your 45-credit SOPHIA Core curriculum in parallel with your Major."
+              }
+            ]
+          }
         ],
         recommendedCourses: [
-          { course_code: "COSC 450 — Data Science Senior Capstone", credits: "4 Cr", fulfills_req: "✓ Required Major Capstone", prereq_status: "⚠ Prereq Override Requested", schedule_modality: "MWF 10:00 AM · Screen-Reader & Captioned Labs", grad_impact: "⛔ Required in Spring to Graduate May 2027" },
-          { course_code: "RELI 218 — Global Christianities (SOPHIA R2)", credits: "3 Cr", fulfills_req: "✓ Final SOPHIA Gen-Ed (R2)", prereq_status: "✓ All Prerequisites Met", schedule_modality: "TR 1:30 PM · Digital Braille/EPUB Syllabus", grad_impact: "✓ Completes 100% of SOPHIA Plan" },
-          { course_code: "DATA 340 — Applied Machine Learning", credits: "4 Cr", fulfills_req: "✓ Major Upper-Level Track", prereq_status: "✓ All Prerequisites Met", schedule_modality: "MWF 1:00 PM · Captioned Lecture Capture", grad_impact: "✓ Matches AI Career Goal" },
-          { course_code: "COSC 315 — Accessible Human-Computer Interaction", credits: "3 Cr", fulfills_req: "✓ Career Elective (14 Cr Total)", prereq_status: "✓ All Prerequisites Met", schedule_modality: "TR 9:30 AM · Universal Design Studio", grad_impact: "🌐 Keeps Spring Load at 14 Cr (≥12 Cr F-1 Min)" }
-        ]
+          {
+            course_code: "COSC 450 — Data Science Senior Capstone",
+            pillar: "Major Core (Capstone)",
+            credits: "4 Credits",
+            meeting_window: "MWF 10:00 – 10:50 AM",
+            seats_left: "2 of 20 Open",
+            downstream_tradeoff: "Spring-only capstone required for May 2027 graduation"
+          },
+          {
+            course_code: "DATA 340 — Applied Machine Learning",
+            pillar: "Major Core",
+            credits: "4 Credits",
+            meeting_window: "MWF 1:00 – 1:50 PM",
+            seats_left: "6 of 25 Open",
+            downstream_tradeoff: "Competes with ART 140 at MWF 1:00 PM; unlocks Fall 400-level AI track"
+          },
+          {
+            course_code: "MATH 310 — Linear Algebra",
+            pillar: "Mathematics Minor",
+            credits: "4 Credits",
+            meeting_window: "TR 9:30 – 10:45 AM",
+            seats_left: "8 of 24 Open",
+            downstream_tradeoff: "Competes with COSC 315 at TR 9:30 AM; finishes Math Minor"
+          },
+          {
+            course_code: "RELI 218 — Global Christianities",
+            pillar: "Parallel SOPHIA (R2)",
+            credits: "3 Credits",
+            meeting_window: "TR 1:30 – 2:45 PM",
+            seats_left: "9 of 25 Open",
+            downstream_tradeoff: "Completes final 3 credits of 45-credit SOPHIA Core"
+          },
+          {
+            course_code: "COSC 315 — Accessible Human-Computer Interaction",
+            pillar: "Career Elective",
+            credits: "3 Credits",
+            meeting_window: "TR 9:30 – 10:45 AM",
+            seats_left: "11 of 25 Open",
+            downstream_tradeoff: "Fits TR 9:30 AM slot; brings total load to 14 credits"
+          },
+          {
+            course_code: "ART 140 — Studio Ceramics",
+            pillar: "Liberal Arts Elective",
+            credits: "4 Credits",
+            meeting_window: "MWF 1:00 – 2:50 PM",
+            seats_left: "4 of 16 Open",
+            downstream_tradeoff: "Competes with DATA 340 at MWF 1:00 PM; shifts DATA 340 to Fall if chosen"
+          }
+        ],
+        scheduleSummary: {
+          sliceLabel: "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective",
+          totalCredits: "14 Credits (4 Courses)",
+          f1Status: "14 Credits (Meets 12-Credit Full-Time Minimum)"
+        },
+        calendarEvents: [
+          {
+            slotId: "09:30",
+            days: "TR",
+            course: "COSC 315",
+            title: "Accessible Human-Computer Interaction",
+            bucket: "Elective"
+          },
+          {
+            slotId: "10:00",
+            days: "MWF",
+            course: "COSC 450",
+            title: "Data Science Senior Capstone",
+            bucket: "Major Core"
+          },
+          {
+            slotId: "13:00",
+            days: "MWF",
+            course: "DATA 340",
+            title: "Applied Machine Learning",
+            bucket: "Major Core"
+          },
+          {
+            slotId: "13:30",
+            days: "TR",
+            course: "RELI 218",
+            title: "Global Christianities",
+            bucket: "SOPHIA"
+          }
+        ],
+        myProgress: [
+          { category: "Overall 124-Credit Bachelor's Degree (78 Earned + 14 Current + 14 Planned = 106/124)", percent: 85, status: "Leaves Only 18 Credits for Senior Year" },
+          { category: "Data Science & CS Major Core (After COSC 450 + DATA 340)", percent: 91, status: "Only 1 Senior Elective Remaining" },
+          { category: "SOPHIA General Education Plan (After RELI 218 R2)", percent: 100, status: "100% Complete (45 of 45 Credits)" },
+          { category: "F-1 International Full-Time Enrollment Guardrail", percent: 100, status: "14 Credits Planned (Min 12 Cr Required)" }
+        ],
+        courseCatalogDetails: {
+          "COSC 450": {
+            code: "COSC 450",
+            title: "Data Science Senior Capstone",
+            credits: "4 Credits",
+            pillar: "Major Core (Spring-Only Capstone)",
+            instructor: "Dr. Matthewulat",
+            schedule: "Mon / Wed / Fri · 10:00 – 10:50 AM",
+            location: "Froiland Science Complex 114",
+            seats: "2 of 20 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "COSC 320 & DATA 310 (Prerequisite Override Ready for Advisor Approval)",
+            shortHover: "COSC 450 (4 Cr · MWF 10:00 AM): Culminating project in Data Science & AI. Click for full description & syllabus.",
+            description: "Culminating team and individual capstone experience in Data Science and Computer Science. Students partner with a Sioux Falls community or research sponsor to design, build, audit, and present an end-to-end machine learning or data engineering system with ethical and accessibility evaluation.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/cosc-450-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Weeks 1–4: Problem Scoping, Data Governance & Partner Charter",
+              "Weeks 5–10: Model Development, WCAG Accessibility & Bias Audit",
+              "Weeks 11–15: Final Deployment, Technical Paper & Oral Defense"
+            ]
+          },
+          "DATA 340": {
+            code: "DATA 340",
+            title: "Applied Machine Learning",
+            credits: "4 Credits",
+            pillar: "Major Core (AI Track)",
+            instructor: "Dr. Danielson",
+            schedule: "Mon / Wed / Fri · 1:00 – 1:50 PM",
+            location: "Froiland Science Complex 208",
+            seats: "6 of 25 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "MATH 220 & COSC 210 (All Prerequisites Met)",
+            shortHover: "DATA 340 (4 Cr · MWF 1:00 PM): Supervised/unsupervised ML & neural networks. Unlocks Fall 400-level AI.",
+            description: "Hands-on exploration of supervised and unsupervised learning, feature engineering, ensemble methods, neural network architectures, and responsible AI evaluation using Python and cloud notebooks. Serves as the direct prerequisite for 400-level AI electives.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/data-340-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Module 1: Regression, Regularization & Cross-Validation",
+              "Module 2: Tree Ensembles, Gradient Boosting & Explainability",
+              "Module 3: Deep Learning Foundations & Model Evaluation"
+            ]
+          },
+          "RELI 218": {
+            code: "RELI 218",
+            title: "Global Christianities",
+            credits: "3 Credits",
+            pillar: "Parallel SOPHIA Core (Religion R2)",
+            instructor: "Dr. Haar",
+            schedule: "Tue / Thu · 1:30 – 2:45 PM",
+            location: "Humanities Center 104",
+            seats: "9 of 25 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "RELI 110 (All Prerequisites Met)",
+            shortHover: "RELI 218 (3 Cr · TR 1:30 PM): Completes your final SOPHIA R2 requirement. Click for description & syllabus.",
+            description: "Examines the historical development, theological diversity, and contemporary lived practices of Christian communities across Africa, Asia, Latin America, and the global diaspora. Fulfills the SOPHIA Core Religion (R2) requirement.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/reli-218-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Unit 1: Early African & Asian Christian Traditions (Axum, Alexandria, Kerala)",
+              "Unit 2: Colonial Encounters, Translation & Indigenous Theologies",
+              "Unit 3: Global Migration & Contemporary World Christianity"
+            ]
+          },
+          "COSC 315": {
+            code: "COSC 315",
+            title: "Accessible Human-Computer Interaction",
+            credits: "3 Credits",
+            pillar: "Liberal Arts & Career Elective",
+            instructor: "Prof. Lindqvist",
+            schedule: "Tue / Thu · 9:30 – 10:45 AM",
+            location: "Madsen Center 210",
+            seats: "11 of 25 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "COSC 210 (All Prerequisites Met)",
+            shortHover: "COSC 315 (3 Cr · TR 9:30 AM): Universal design, WCAG 2.2 AAA & assistive tech studio. Click for syllabus.",
+            description: "Studio-based course in human-centered computing, universal design, and WCAG 2.2 AA/AAA accessibility. Students design and test interfaces with screen readers (NVDA/VoiceOver), switch navigation, and high-contrast visual systems.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/cosc-315-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Part 1: Cognitive Walkthroughs, Usability Testing & Inclusive Design",
+              "Part 2: Screen-Reader Semantics, ARIA & Non-Visual Interaction",
+              "Part 3: Semester Design Portfolio & Accessibility Audit Project"
+            ]
+          },
+          "MATH 310": {
+            code: "MATH 310",
+            title: "Linear Algebra",
+            credits: "4 Credits",
+            pillar: "Mathematics Minor Requirement",
+            instructor: "Dr. Sorensen",
+            schedule: "Tue / Thu · 9:30 – 10:45 AM",
+            location: "Froiland Science Complex 220",
+            seats: "8 of 24 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "MATH 152 Calculus II (All Prerequisites Met)",
+            shortHover: "MATH 310 (4 Cr · TR 9:30 AM): Vector spaces, eigenvalues & matrix decompositions. Completes Math Minor.",
+            description: "Rigorous study of systems of linear equations, matrix algebra, determinants, vector spaces, linear transformations, eigenvalues and eigenvectors, orthogonality, and singular value decomposition with applications to data science.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/math-310-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Chapters 1–3: Matrix Operations, Subspaces & Basis",
+              "Chapters 4–5: Eigenvalues, Diagonalization & Dynamical Systems",
+              "Chapters 6–7: Orthogonality, Least Squares & SVD"
+            ]
+          },
+          "ART 140": {
+            code: "ART 140",
+            title: "Studio Ceramics",
+            credits: "4 Credits",
+            pillar: "Liberal Arts Elective (Creative Arts)",
+            instructor: "Prof. Peters",
+            schedule: "Mon / Wed / Fri · 1:00 – 2:50 PM",
+            location: "Center for Visual Arts 102",
+            seats: "4 of 16 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "None — Open to All Undergraduates",
+            shortHover: "ART 140 (4 Cr · MWF 1:00–2:50 PM): Hand-building, wheel-throwing & glaze chemistry. Click for syllabus.",
+            description: "Introduction to ceramic studio processes including hand-building, wheel-throwing, surface design, glaze formulation, and kiln firing. Emphasizes sculptural and functional form within the liberal arts tradition.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/art-140-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Studio Block 1: Pinch, Coil & Slab Architectural Forms",
+              "Studio Block 2: Wheel-Throwing Fundamentals & Trimming",
+              "Studio Block 3: Glaze Chemistry, Firing & Critique Exhibition"
+            ]
+          },
+          "MUSI 118": {
+            code: "MUSI 118",
+            title: "History of Jazz",
+            credits: "2 Credits",
+            pillar: "Liberal Arts Elective",
+            instructor: "Dr. Unger",
+            schedule: "Tue / Thu · 9:30 – 10:20 AM",
+            location: "Fryxell Humanities Center 112",
+            seats: "14 of 30 Seats Remaining (Jenzabar J1 Live)",
+            prerequisites: "None — Open to All Undergraduates",
+            shortHover: "MUSI 118 (2 Cr · TR 9:30 AM): Evolution of jazz from New Orleans to contemporary improvisation.",
+            description: "Traces the cultural and musical history of jazz from its West African and New Orleans roots through Swing, Bebop, Cool Jazz, Hard Bop, Free Jazz, and contemporary global fusion.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/musi-118-syllabus-spring-2027.pdf",
+            syllabusHighlights: [
+              "Era 1: Blues, Ragtime & Early New Orleans Polyphony",
+              "Era 2: Duke Ellington, Swing Big Bands & the Bebop Revolution",
+              "Era 3: Modal Jazz, Miles Davis, John Coltrane & Modern Voices"
+            ]
+          }
+        }
       }
     }
   }

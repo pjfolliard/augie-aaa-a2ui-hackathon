@@ -32,19 +32,19 @@
 
   function classifyBadge(text) {
     const str = String(text || "");
-    if (str.includes("⛔") || /hold|blocked|action required|over capacity|below 12|probation|shortage/i.test(str)) {
-      return { cls: "a2ui-badge-danger", icon: str.includes("⛔") ? "" : "⛔ ", srPrefix: "Critical Alert: " };
+    if (/hold|blocked|action required|over capacity|below 12|probation|shortage|critical|conflict/i.test(str)) {
+      return { cls: "a2ui-badge-danger", icon: "", srPrefix: "Critical Alert: " };
     }
-    if (str.includes("⚠") || /warning|pending|watch|waitlist|tight|under-enrolled|needs/i.test(str)) {
-      return { cls: "a2ui-badge-warning", icon: str.includes("⚠") ? "" : "⚠ ", srPrefix: "Attention Needed: " };
+    if (/warning|pending|watch|waitlist|tight|under-enrolled|needs|shifts|delays/i.test(str)) {
+      return { cls: "a2ui-badge-warning", icon: "", srPrefix: "Attention Needed: " };
     }
-    if (str.includes("🌐") || /f-1|international|sevis/i.test(str)) {
-      return { cls: "a2ui-badge-intl", icon: str.includes("🌐") ? "" : "🌐 ", srPrefix: "International Student Status: " };
+    if (/f-1|international|sevis/i.test(str)) {
+      return { cls: "a2ui-badge-intl", icon: "", srPrefix: "International Student Status: " };
     }
-    if (str.includes("✓") || /clear|good standing|met|approved|on track|healthy|ready|registered/i.test(str)) {
-      return { cls: "a2ui-badge-success", icon: str.includes("✓") ? "" : "✓ ", srPrefix: "Positive Status: " };
+    if (/clear|good standing|met|approved|on track|healthy|ready|registered|locked|selected|complete|included/i.test(str)) {
+      return { cls: "a2ui-badge-success", icon: "", srPrefix: "Positive Status: " };
     }
-    return { cls: "a2ui-badge-neutral", icon: "• ", srPrefix: "Status: " };
+    return { cls: "a2ui-badge-neutral", icon: "", srPrefix: "Status: " };
   }
 
   function renderJargonChip(termKey, zionSchema, lang, showGlossary) {
@@ -54,11 +54,11 @@
     const entry = zionSchema.jargonGlossary[termKey];
     const i18nLabel = lang && lang !== "en" && entry.i18n && entry.i18n[lang] ? ` · ${entry.i18n[lang]}` : "";
     if (!showGlossary && (!lang || lang === "en")) {
-      return `<span class="jargon-pill" tabindex="0" role="note" aria-label="${escapeHtml(entry.term)}: ${escapeHtml(entry.plainLanguage)}" title="${escapeHtml(entry.plainLanguage)}">ℹ️ ${escapeHtml(termKey)}</span>`;
+      return `<span class="jargon-pill" tabindex="0" role="note" aria-label="${escapeHtml(entry.term)}: ${escapeHtml(entry.plainLanguage)}" title="${escapeHtml(entry.plainLanguage)}">Glossary: ${escapeHtml(termKey)}</span>`;
     }
     return `
       <span class="jargon-expanded" role="note">
-        <strong>ℹ️ ${escapeHtml(entry.term)}${escapeHtml(i18nLabel)}:</strong>
+        <strong>${escapeHtml(entry.term)}${escapeHtml(i18nLabel)}:</strong>
         <span>${escapeHtml(entry.plainLanguage)}</span>
       </span>
     `;
@@ -190,6 +190,27 @@
             items.map((i) => `${i.category}: ${i.percent}% complete, ${i.status}`).join("; ")
         );
       }
+      if (comp.PriorityTradeoffExplorer) {
+        const ex = comp.PriorityTradeoffExplorer;
+        const modes = resolvePointer(dataModel, ex.modesPath) || [];
+        const buckets = resolvePointer(dataModel, ex.bucketsPath) || [];
+        lines.push(
+          `[Interactive Priority & Liberal Arts Trade-Off Explorer: ${ex.title}]: ` +
+            `Available Priority Slices: ${modes.map((m) => `${m.label} (${m.summary})`).join("; ")}. ` +
+            `Degree Buckets: ${buckets.map((b) => `${b.title}: ${b.credits} — ${b.tradeoff}`).join("; ")}.`
+        );
+      }
+      if (comp.WeeklyScheduleCalendar) {
+        const cal = comp.WeeklyScheduleCalendar;
+        const events = resolvePointer(dataModel, cal.eventsPath) || [];
+        const summary = resolvePointer(dataModel, cal.summaryPath) || {};
+        lines.push(
+          `[Monday-Through-Friday Weekly Schedule Calendar: ${cal.title}]: ` +
+            `Total Planned Credits: ${summary.totalCredits || "14 Cr"} (${summary.f1Status || "F-1 Compliant"}). ` +
+            `Conflict Status: ${summary.conflictStatus || "0 Conflicts"}. ` +
+            `Scheduled Classes: ${events.map((e) => `${e.course} (${e.days} ${e.time}, ${e.room}) — ${e.conflictNote || "No Conflict"}`).join("; ")}.`
+        );
+      }
       if (comp.DataTable) {
         const t = comp.DataTable;
         const rows = resolvePointer(dataModel, t.rowsPath) || [];
@@ -306,7 +327,6 @@
         return `
           <section class="a2ui-alert a2ui-alert-${escapeHtml(sev)}" role="region" aria-label="Advising Alert Banner">
             <div class="a2ui-alert-header">
-              <span class="a2ui-alert-icon" aria-hidden="true">${escapeHtml(b.icon || "ℹ️")}</span>
               <h3 class="a2ui-alert-title">${escapeHtml(b.title)}</h3>
             </div>
             <p class="a2ui-alert-msg">${escapeHtml(b.message)}</p>
@@ -325,7 +345,6 @@
               <article class="a2ui-kpi-card a2ui-kpi-${escapeHtml(item.status || "info")}">
                 <div class="a2ui-kpi-top">
                   <span class="a2ui-kpi-label">${escapeHtml(item.label)}</span>
-                  <span class="a2ui-kpi-icon" aria-hidden="true">${escapeHtml(item.icon || "📊")}</span>
                 </div>
                 <div class="a2ui-kpi-value">${escapeHtml(item.value)}</div>
                 <div class="a2ui-kpi-delta">${escapeHtml(item.delta)}</div>
@@ -365,6 +384,311 @@
               `
                 )
                 .join("")}
+            </div>
+          </section>
+        `;
+      }
+
+      if (comp.PriorityTradeoffExplorer) {
+        const ex = comp.PriorityTradeoffExplorer;
+        const activeMode = resolvePointer(dataModel, ex.activeModePath) || "balanced_mix";
+        const modes = resolvePointer(dataModel, ex.modesPath) || [];
+        const buckets = resolvePointer(dataModel, ex.bucketsPath) || [];
+        const courseCatalog = resolvePointer(dataModel, "/courseCatalogDetails") || {};
+        const currentModeObj = modes.find((m) => m.id === activeMode) || modes[0] || {};
+        return `
+          <section class="a2ui-card a2ui-priority-explorer" role="region" aria-label="${escapeHtml(ex.title)}">
+            <div class="a2ui-card-header">
+              <div>
+                <h3 class="a2ui-card-title">${escapeHtml(ex.title)}</h3>
+                ${ex.subtitle ? `<p class="a2ui-card-subtitle">${escapeHtml(ex.subtitle)}</p>` : ""}
+              </div>
+              <span class="a2ui-catalog-tag">A2UI v0.9 MaterialTabs + Canvas · Click Any Course for Description &amp; Syllabus</span>
+            </div>
+            <div class="a2ui-explorer-body">
+              <div class="a2ui-priority-tabs-label">Select a Semester Mix Option to See the Recommended Courses in Each Pillar (Hover or Click Any Course to Open Description &amp; Syllabus):</div>
+              <div class="a2ui-priority-pills" role="tablist" aria-label="Schedule Priority Slices">
+                ${modes
+                  .map((m) => {
+                    const isSel = m.id === activeMode;
+                    return `
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected="${isSel ? "true" : "false"}"
+                        class="a2ui-priority-pill ${isSel ? "active" : ""}"
+                        data-priority-mode="${escapeHtml(m.id)}"
+                      >
+                        <div class="priority-pill-title">${escapeHtml(m.label)}</div>
+                        <div class="priority-pill-sub">${escapeHtml(m.summary || "")}</div>
+                      </button>
+                    `;
+                  })
+                  .join("")}
+              </div>
+
+              <div class="a2ui-buckets-horizontal" role="list" aria-label="Recommended Courses by Curriculum Pillar">
+                ${buckets
+                  .map((b) => {
+                    const courses = Array.isArray(b.coursesByMode?.[activeMode])
+                      ? b.coursesByMode[activeMode]
+                      : Array.isArray(b.courses)
+                      ? b.courses
+                      : [];
+                    return `
+                      <article class="a2ui-pillar-row" role="listitem">
+                        <div class="a2ui-pillar-left">
+                          <h4 class="a2ui-bucket-title">${escapeHtml(b.title)}</h4>
+                          <div class="a2ui-bucket-credits">${escapeHtml(b.subtitle || "")}</div>
+                        </div>
+                        <div class="a2ui-pillar-right">
+                          ${courses
+                            .map((c) => {
+                              const codeMatch = String(c).match(/([A-Z]{4}\s+\d{3})/);
+                              const courseCode = codeMatch ? codeMatch[1] : "";
+                              const meta = courseCode && courseCatalog[courseCode] ? courseCatalog[courseCode] : null;
+                              if (meta) {
+                                return `
+                                  <div class="a2ui-pillar-course-line">
+                                    <button
+                                      type="button"
+                                      class="course-inspect-link"
+                                      data-course-code="${escapeHtml(courseCode)}"
+                                      title="${escapeHtml(meta.shortHover || meta.description || "Click to view course description and syllabus in side panel")}"
+                                    >
+                                      <span>${escapeHtml(c)}</span>
+                                      <span class="course-inspect-hint">View Description &amp; Syllabus</span>
+                                    </button>
+                                  </div>
+                                `;
+                              }
+                              return `<div class="a2ui-pillar-course-line">${escapeHtml(c)}</div>`;
+                            })
+                            .join("")}
+                        </div>
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+
+              ${
+                currentModeObj.tradeoffBanner
+                  ? `
+                <div class="a2ui-tradeoff-banner a2ui-tradeoff-${escapeHtml(currentModeObj.severity || "info")}" role="status">
+                  <div><strong>${escapeHtml(currentModeObj.tradeoffTitle || "Mix Summary:")}</strong></div>
+                  <div>${escapeHtml(currentModeObj.tradeoffBanner)}</div>
+                </div>
+              `
+                  : ""
+              }
+            </div>
+          </section>
+        `;
+      }
+
+      if (comp.CourseConflictConfigurator) {
+        const cfg = comp.CourseConflictConfigurator;
+        const slots = resolvePointer(dataModel, cfg.slotsPath) || [];
+        const courseCatalog = resolvePointer(dataModel, "/courseCatalogDetails") || {};
+        return `
+          <section class="a2ui-card a2ui-conflict-configurator" role="region" aria-label="${escapeHtml(cfg.title)}">
+            <div class="a2ui-card-header">
+              <div>
+                <h3 class="a2ui-card-title">${escapeHtml(cfg.title)}</h3>
+                ${cfg.subtitle ? `<p class="a2ui-card-subtitle">${escapeHtml(cfg.subtitle)}</p>` : ""}
+              </div>
+              <span class="a2ui-catalog-tag">A2UI v0.9 MaterialSelect · Course &amp; Conflict Selector</span>
+            </div>
+            <div class="a2ui-slot-list">
+              ${slots
+                .map((slot, sIdx) => {
+                  const selectId = `slot-select-${sIdx}`;
+                  const selectedOpt =
+                    (slot.options || []).find((o) => o.value === slot.selectedValue) ||
+                    (slot.options || [])[0] ||
+                    {};
+                  const isContested = (slot.options || []).length > 1;
+                  const chosenCode = selectedOpt.course || slot.selectedValue || "";
+                  const meta = courseCatalog[chosenCode] || null;
+                  return `
+                    <div class="a2ui-slot-row ${isContested ? "a2ui-slot-contested" : ""}">
+                      <div class="a2ui-slot-time">
+                        <div class="a2ui-slot-days">${escapeHtml(slot.timeLabel)}</div>
+                        <div class="a2ui-slot-status">${escapeHtml(slot.slotType)}</div>
+                      </div>
+                      <div class="a2ui-slot-picker">
+                        <label for="${selectId}" class="a2ui-field-label">${escapeHtml(slot.pickerLabel || "Select Course for This Time Slot")}</label>
+                        ${
+                          isContested
+                            ? `
+                          <select id="${selectId}" class="a2ui-input a2ui-slot-select" data-slot-id="${escapeHtml(slot.slotId)}">
+                            ${(slot.options || [])
+                              .map(
+                                (opt) =>
+                                  `<option value="${escapeHtml(opt.value)}" ${opt.value === slot.selectedValue ? "selected" : ""}>${escapeHtml(opt.label)}</option>`
+                              )
+                              .join("")}
+                          </select>
+                        `
+                            : `<div class="a2ui-slot-locked-box">${escapeHtml(selectedOpt.label || "")}</div>`
+                        }
+                        ${
+                          chosenCode
+                            ? `
+                          <button
+                            type="button"
+                            class="course-inline-syllabus-btn"
+                            data-course-code="${escapeHtml(chosenCode)}"
+                            title="${escapeHtml(meta?.shortHover || "Open course description and syllabus side panel")}"
+                          >
+                            Open ${escapeHtml(chosenCode)} Description &amp; Syllabus Side Panel
+                          </button>
+                        `
+                            : ""
+                        }
+                      </div>
+                      <div class="a2ui-slot-impact">
+                        <div class="a2ui-slot-impact-heading">Downstream Effect &amp; Trade-Off</div>
+                        <div class="a2ui-slot-impact-text">${escapeHtml(selectedOpt.tradeoff || slot.defaultTradeoff || "")}</div>
+                      </div>
+                    </div>
+                  `;
+                })
+                .join("")}
+            </div>
+          </section>
+        `;
+      }
+
+      if (comp.WeeklyScheduleCalendar) {
+        const cal = comp.WeeklyScheduleCalendar;
+        const events = resolvePointer(dataModel, cal.eventsPath) || [];
+        const summary = resolvePointer(dataModel, cal.summaryPath) || {};
+        const courseCatalog = resolvePointer(dataModel, "/courseCatalogDetails") || {};
+        const daysOrder = [
+          { code: "M", label: "Monday" },
+          { code: "T", label: "Tuesday" },
+          { code: "W", label: "Wednesday" },
+          { code: "R", label: "Thursday" },
+          { code: "F", label: "Friday" }
+        ];
+        const timeSlots = [
+          { id: "09:00", label: "9:00 – 9:50 AM" },
+          { id: "09:30", label: "9:30 – 10:45 AM" },
+          { id: "10:00", label: "10:00 – 10:50 AM" },
+          { id: "11:00", label: "11:00 – 11:50 AM" },
+          { id: "13:00", label: "1:00 – 1:50 PM" },
+          { id: "13:30", label: "1:30 – 2:45 PM" },
+          { id: "14:00", label: "2:00 – 3:15 PM" },
+          { id: "15:00", label: "3:00 – 4:15 PM" }
+        ].filter((slot) => events.some((e) => e.slotId === slot.id));
+
+        return `
+          <section class="a2ui-card a2ui-calendar-card" role="region" aria-label="${escapeHtml(cal.title)}">
+            <div class="a2ui-card-header">
+              <div>
+                <h3 class="a2ui-card-title">${escapeHtml(cal.title)}</h3>
+                ${cal.subtitle ? `<p class="a2ui-card-subtitle">${escapeHtml(cal.subtitle)}</p>` : ""}
+              </div>
+              <span class="a2ui-catalog-tag">A2UI v0.9 MaterialGridList · Hover or Click Any Course Block for Details</span>
+            </div>
+
+            <div class="a2ui-schedule-summary-bar" role="region" aria-label="Converged Schedule Summary">
+              <div class="sched-pill">
+                <span class="sched-pill-label">Selected Mix:</span>
+                <strong>${escapeHtml(summary.sliceLabel || "Balanced Major/Core + Parallel SOPHIA + Elective")}</strong>
+              </div>
+              <div class="sched-pill">
+                <span class="sched-pill-label">Total Spring Load:</span>
+                <strong>${escapeHtml(summary.totalCredits || "14 Credits (4 Courses)")}</strong>
+              </div>
+              <div class="sched-pill">
+                <span class="sched-pill-label">F-1 / Full-Time Guardrail:</span>
+                <strong>${escapeHtml(summary.f1Status || "14 Credits (Meets 12-Credit Full-Time Minimum)")}</strong>
+              </div>
+            </div>
+
+            <div class="a2ui-table-scroll" tabindex="0" role="region" aria-label="Monday through Friday Class Schedule Calendar Grid">
+              <table class="a2ui-calendar-grid">
+                <caption>Monday through Friday Visual Course Schedule (Spring 2027 — Click any course block to open its description and syllabus)</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="cal-time-col">Time Slot</th>
+                    ${daysOrder.map((d) => `<th scope="col">${escapeHtml(d.label)}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${timeSlots
+                    .map((slot) => {
+                      return `
+                        <tr>
+                          <th scope="row" class="cal-time-cell">${escapeHtml(slot.label)}</th>
+                          ${daysOrder
+                            .map((day) => {
+                              const matches = events.filter(
+                                (ev) => ev.slotId === slot.id && String(ev.days || "").includes(day.code)
+                              );
+                              if (!matches.length) {
+                                return `<td class="cal-empty-cell"><span class="sr-only">Open slot</span></td>`;
+                              }
+                              return `
+                                <td class="cal-event-cell">
+                                  ${matches
+                                    .map((ev) => {
+                                      const catCls =
+                                        ev.bucket === "Elective"
+                                          ? "cal-block-elective"
+                                          : ev.bucket === "SOPHIA"
+                                          ? "cal-block-sophia"
+                                          : "cal-block-major";
+                                      const meta = courseCatalog[ev.course] || null;
+                                      return `
+                                        <button
+                                          type="button"
+                                          class="cal-course-block cal-course-btn ${catCls}"
+                                          data-course-code="${escapeHtml(ev.course)}"
+                                          title="${escapeHtml(meta?.shortHover || `${ev.course} — ${ev.title}. Click to view course description and syllabus.`)}"
+                                        >
+                                          <div class="cal-course-code">${escapeHtml(ev.course)}</div>
+                                          <div class="cal-course-name">${escapeHtml(ev.title)}</div>
+                                        </button>
+                                      `;
+                                    })
+                                    .join("")}
+                                </td>
+                              `;
+                            })
+                            .join("")}
+                        </tr>
+                      `;
+                    })
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        `;
+      }
+
+      if (comp.ScheduleExportCard) {
+        const exp = comp.ScheduleExportCard;
+        return `
+          <section class="a2ui-card a2ui-export-card" role="region" aria-label="${escapeHtml(exp.title)}">
+            <div class="a2ui-card-header">
+              <div>
+                <h3 class="a2ui-card-title">${escapeHtml(exp.title)}</h3>
+                <p class="a2ui-card-subtitle">${escapeHtml(exp.description || "")}</p>
+              </div>
+              <span class="a2ui-catalog-tag">A2UI v0.9 A2A File Part Export &amp; Advisor Approval</span>
+            </div>
+            <div class="a2ui-export-actions-bar">
+              <button type="button" class="btn-augie-primary btn-export-softcopy" data-export-action="download_plan">
+                <span>${escapeHtml(exp.exportButtonLabel || "Download / Print Advising Plan (Soft Copy for Advising Session)")}</span>
+              </button>
+              <button type="button" class="btn-augie-outline btn-email-advisor" data-export-action="email_advisor" data-advisor-email="${escapeHtml(exp.advisorEmail || "m.matthewulat@augie.edu")}" data-advisor-name="${escapeHtml(exp.advisorName || "Dr. Matthewulat")}">
+                <span>${escapeHtml(exp.emailButtonLabel || "Email Plan to Advisor for Registration Approval")}</span>
+              </button>
             </div>
           </section>
         `;
@@ -472,7 +796,6 @@
                                       .map(
                                         (act) => `
                                       <button type="button" class="a2ui-action-btn" data-action-id="${escapeHtml(act.id)}" data-row-target="${escapeHtml(rowIdVal)}" aria-label="${escapeHtml(act.label)} for ${escapeHtml(rowIdVal)}">
-                                        <span aria-hidden="true">${escapeHtml(act.icon || "▶")}</span>
                                         <span>${escapeHtml(act.label)}</span>
                                       </button>
                                     `
@@ -532,7 +855,6 @@
               </div>
               <div class="a2ui-form-footer">
                 <button type="submit" class="btn-augie-primary">
-                  <span aria-hidden="true">⚡</span>
                   <span>${escapeHtml(form.submitLabel || "Submit Action to ADK Agent")}</span>
                 </button>
               </div>
@@ -545,9 +867,9 @@
     }
 
     const layoutLabels = {
-      "inverted-pyramid": "✨ AI Best-Practice Layout: Inverted-Pyramid Triage (Alert → KPIs → Table → Action)",
-      "split-dashboard": "✨ AI Best-Practice Layout: Split Action Dashboard (Table + Side-by-Side Action/Progress)",
-      "table-first": "✨ AI Best-Practice Layout: Table-First High-Density Roster"
+      "inverted-pyramid": "AI Best-Practice Layout: Inverted-Pyramid Triage (Alert -> KPIs -> Table -> Action)",
+      "split-dashboard": "AI Best-Practice Layout: Split Action Dashboard (Table + Side-by-Side Action/Progress)",
+      "table-first": "AI Best-Practice Layout: Table-First High-Density Roster"
     };
 
     const questionBanner = activeQuestion
@@ -556,9 +878,8 @@
           <div class="q-context-badge">Persona Question ${escapeHtml(activeQuestion.number)} of 10</div>
           <div class="q-context-text">“${escapeHtml(activeQuestion.question)}”</div>
           <div class="q-context-scope">
-            <span>RBAC Scope: <strong>${escapeHtml(persona?.advisingScope || "")}</strong></span>
-            <span> · </span>
-            <span style="color:var(--augie-gold); font-weight:700;">${escapeHtml(layoutLabels[layoutMode] || layoutLabels["inverted-pyramid"])}</span>
+            <div>RBAC Scope: <strong>${escapeHtml(persona?.advisingScope || "")}</strong></div>
+            <div style="color:var(--augie-gold); font-weight:700;">${escapeHtml(layoutLabels[layoutMode] || layoutLabels["inverted-pyramid"])}</div>
           </div>
         </div>
       `
@@ -572,6 +893,62 @@
         const tId = btn.getAttribute("data-table-id");
         const cKey = btn.getAttribute("data-col-key");
         onSortChange(tId, cKey);
+      });
+    });
+
+    // Bind PriorityTradeoffExplorer mode buttons
+    container.querySelectorAll(".a2ui-priority-pill").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const modeId = btn.getAttribute("data-priority-mode");
+        onAction({
+          type: "prioritySliceChange",
+          modeId,
+          surfaceId: payload.surfaceId
+        });
+      });
+    });
+
+    // Bind CourseConflictConfigurator slot dropdowns
+    container.querySelectorAll(".a2ui-slot-select").forEach((sel) => {
+      sel.addEventListener("change", () => {
+        const slotId = sel.getAttribute("data-slot-id");
+        const chosenCourse = sel.value;
+        onAction({
+          type: "slotDropdownChange",
+          slotId,
+          chosenCourse,
+          surfaceId: payload.surfaceId
+        });
+      });
+    });
+
+    // Bind Course Inspect buttons (Step 1, Step 2, Step 3 -> Opens A2UI Canvas Side Panel)
+    container.querySelectorAll("[data-course-code]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const courseCode = btn.getAttribute("data-course-code");
+        if (courseCode) {
+          onAction({
+            type: "inspectCourse",
+            courseCode,
+            surfaceId: payload.surfaceId
+          });
+        }
+      });
+    });
+
+    // Bind ScheduleExportCard buttons (Download Soft Copy / Email Advisor)
+    container.querySelectorAll("[data-export-action]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const exportAction = btn.getAttribute("data-export-action");
+        const advisorEmail = btn.getAttribute("data-advisor-email") || "m.matthewulat@augie.edu";
+        const advisorName = btn.getAttribute("data-advisor-name") || "Dr. Matthewulat";
+        onAction({
+          type: "exportSchedule",
+          exportAction,
+          advisorEmail,
+          advisorName,
+          surfaceId: payload.surfaceId
+        });
       });
     });
 
