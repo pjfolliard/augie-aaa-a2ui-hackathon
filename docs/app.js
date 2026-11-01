@@ -22,10 +22,11 @@
     }
     customViews[p.id] = JSON.parse(JSON.stringify(baseViews[p.id] || {}));
   });
-  // Clear any stale cached student_q1 view so the latest Q1 Both/And + Calendar build always renders fresh
+  // Clear any stale cached student_q1 / student_q2 views so the latest builds always render fresh
   try {
     sessionStorage.removeItem("augie_a2ui_view_student");
     sessionStorage.removeItem("augie_a2ui_view_student_q1");
+    sessionStorage.removeItem("augie_a2ui_view_student_q2");
   } catch (e) {}
 
   const PERSONA_RECOMMENDED_LAYOUT = {
@@ -76,7 +77,7 @@
     }
     const p = getActivePersona();
     const q = getActiveQuestion();
-    const base = customViews[state.activePersonaId] || baseViews[state.activePersonaId] || {};
+    const base = baseViews[state.activePersonaId] || customViews[state.activePersonaId] || {};
     if (window.AUGIE_QUESTION_VIEW_ADAPTER) {
       const adapted = window.AUGIE_QUESTION_VIEW_ADAPTER.adaptPayloadForQuestion(base, p, q);
       customViews[key] = adapted.payload;
@@ -87,8 +88,11 @@
 
   function saveActivePayload(newPayload) {
     const key = getActiveViewKey();
+    const q = getActiveQuestion();
     customViews[key] = newPayload;
-    customViews[state.activePersonaId] = newPayload;
+    if ((q?.number || 1) === 1) {
+      customViews[state.activePersonaId] = newPayload;
+    }
     try {
       sessionStorage.setItem(`augie_a2ui_view_${key}`, JSON.stringify(newPayload));
     } catch (e) {
@@ -430,6 +434,161 @@
           return;
         }
 
+        if (evt.type === "gradPathwayChange") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          dataModel.activeGradPathwayId = evt.pathwayId;
+          const kpiComp = (payload?.surfaceUpdate?.components || []).find(
+            (c) => c.component && c.component.KPIStatRow
+          );
+          if (kpiComp && Array.isArray(kpiComp.component.KPIStatRow.items)) {
+            const termKpi = kpiComp.component.KPIStatRow.items[0];
+            if (termKpi) {
+              if (evt.pathwayId === "accelerate_dec_2027") {
+                termKpi.value = "Dec 2027";
+                termKpi.trend = "Accelerated (1 Semester Early via J-Term + Summer)";
+              } else if (evt.pathwayId === "explore_majors_minors") {
+                termKpi.value = "May 2028";
+                termKpi.trend = "On Time + Added Minor / Double Major Credential";
+              } else if (evt.pathwayId === "experiential_internship_abroad") {
+                termKpi.value = "May 2028";
+                termKpi.trend = "On Time + Sioux Falls Industry Internship";
+              } else {
+                termKpi.value = "May 2028";
+                termKpi.trend = "3 Semesters Left · Can Accelerate to Dec 2027";
+              }
+            }
+          }
+          saveActivePayload(payload);
+          renderMainSurface();
+          renderJsonEditor();
+          const chosenPw = (dataModel.gradPathways || []).find((p) => p.id === evt.pathwayId);
+          showToast(
+            `Updated Graduation Pathway`,
+            chosenPw ? `${chosenPw.buttonLabel} (${chosenPw.graduationDate})` : `Switched graduation pathway.`
+          );
+          return;
+        }
+
+        if (evt.type === "exploreProgramSimulate") {
+          const dataModel = payload?.dataModelUpdate?.contents || {};
+          dataModel.activeGradPathwayId = "explore_majors_minors";
+          const explorePw = (dataModel.gradPathways || []).find((p) => p.id === "explore_majors_minors");
+          const opt = (dataModel.explorationOptions || []).find((o) => o.id === evt.programId);
+          if (explorePw && opt) {
+            explorePw.highlightedExplorationId = opt.id;
+            explorePw.graduationDate = `May 2028 (With ${opt.title})`;
+            explorePw.guidanceSummary = `${opt.fitExplanation} Your term-by-term roadmap below has been updated to include the required courses for ${opt.title} while keeping your May 2028 graduation date intact.`;
+            if (opt.id === "studio_art_minor") {
+              explorePw.terms = [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Capstone + SOPHIA + Studio Art Minor Course 1",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "ART 140 — Studio Ceramics (4 Cr · Studio Art Minor Course 1 of 3)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Career Elective)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Studio Art & Core Semester)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Major Core, Math Minor, and Studio Art Minor Course 2",
+                  courses: [
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "MATH 310 — Linear Algebra (4 Cr · Completes Mathematics Minor)",
+                    "ART 180 — Digital Design & Visual Communication (4 Cr · Studio Art Minor Course 2 of 3)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Graduate With Studio Art Minor)",
+                  creditsLabel: "6–12 Credits (118 -> 124 of 124 Credits)",
+                  milestoneNote: "Completes Studio Art Minor Course 3 and reaches 124 credits on schedule",
+                  courses: [
+                    "ART 240 — Intermediate Ceramic Sculpture (4 Cr · Completes Studio Art Minor)",
+                    "MUSI 118 — History of Jazz (2 Cr · Reaches 124.0 Credits for May 2028 Commencement)"
+                  ]
+                }
+              ];
+            } else if (opt.id === "ai_ethics_cert") {
+              explorePw.terms = [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Capstone + ML + AI Ethics Certificate Course 1",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · AI Ethics Track)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (AI Ethics & Sioux Falls Internship Semester)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Completes AI Ethics Certificate, Industry Internship, and Mathematics Minor",
+                  courses: [
+                    "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · Completes AI Ethics Certificate)",
+                    "COSC 495 — Sioux Falls Industry Data Science Internship (4 Cr · Experiential Practicum)",
+                    "MATH 310 — Linear Algebra (4 Cr · Completes Mathematics Minor)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Creative Exploration Finish)",
+                  creditsLabel: "6–12 Credits (118 -> 124 of 124 Credits)",
+                  milestoneNote: "6 open credits remaining to reach 124.0 total graduation credits",
+                  courses: [
+                    "ART 140 — Studio Ceramics (4 Cr · Open Creative Elective)",
+                    "MUSI 118 — History of Jazz (2 Cr · Reaches 124.0 Credits for May 2028 Commencement)"
+                  ]
+                }
+              ];
+            } else {
+              explorePw.terms = [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Capstone, Applied ML, and Final SOPHIA Requirement",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Career Elective)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Mathematics Double Major Expansion)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Advances from Mathematics Minor toward full Mathematics Second Major",
+                  courses: [
+                    "MATH 310 — Linear Algebra (4 Cr · Math Double Major Core)",
+                    "MATH 320 — Probability & Mathematical Statistics (4 Cr · Math Double Major Core)",
+                    "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · Elective)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Graduate With Double Major)",
+                  creditsLabel: "6–12 Credits (118 -> 124 of 124 Credits)",
+                  milestoneNote: "Completes Mathematics Double Major and reaches 124.0 credits on time",
+                  courses: [
+                    "MATH 410 — Real Analysis (4 Cr · Completes Mathematics Double Major)",
+                    "MUSI 118 — History of Jazz (2 Cr · Reaches 124.0 Credits for May 2028 Commencement)"
+                  ]
+                }
+              ];
+            }
+          }
+          saveActivePayload(payload);
+          renderMainSurface();
+          renderJsonEditor();
+          showToast(
+            `Simulated Adding ${opt?.shortButtonLabel || "Credential"}`,
+            `Updated your May 2028 Term-by-Term Roadmap using your 16 open credits.`
+          );
+          return;
+        }
+
         if (evt.type === "inspectCourse") {
           const dataModel = payload?.dataModelUpdate?.contents || {};
           const detailsMap = dataModel.courseCatalogDetails || {};
@@ -438,6 +597,7 @@
           const titleEl = document.getElementById("course-drawer-title");
           const bodyEl = document.getElementById("course-drawer-body");
           if (drawer && titleEl && bodyEl && info) {
+            const syllabusItems = info.syllabusHighlights || info.syllabusOutline || [];
             titleEl.textContent = `${info.code} — ${info.title}`;
             bodyEl.innerHTML = `
               <div class="course-drawer-meta-grid">
@@ -473,9 +633,9 @@
               </div>
 
               <div class="course-drawer-section">
-                <h4>Spring 2027 Syllabus Outline</h4>
+                <h4>Course Syllabus Outline</h4>
                 <ul class="course-drawer-syllabus-list">
-                  ${(info.syllabusOutline || []).map((item) => `<li>${item}</li>`).join("")}
+                  ${syllabusItems.map((item) => `<li>${item}</li>`).join("")}
                 </ul>
               </div>
 
@@ -493,7 +653,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>${info.code} — ${info.title} Syllabus (Spring 2027)</title>
+  <title>${info.code} — ${info.title} Syllabus</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #081E3F; max-width: 760px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.6; }
     header { border-bottom: 4px solid #FED102; background: #081E3F; color: #fff; padding: 1.25rem 1.5rem; border-radius: 8px; }
@@ -506,7 +666,7 @@
   <header>
     <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.06em; color:#FED102; font-weight:700;">Augustana University — Sioux Falls, SD</div>
     <h1>${info.code}: ${info.title} (${info.credits})</h1>
-    <div>Spring 2027 Official Course Syllabus</div>
+    <div>Official Course Syllabus</div>
   </header>
   <div class="meta">
     <div><strong>Instructor:</strong> ${info.instructor}</div>
@@ -516,9 +676,9 @@
   </div>
   <h2>Course Description</h2>
   <p>${info.description}</p>
-  <h2>Spring 2027 Weekly Module Outline</h2>
+  <h2>Weekly Module Outline</h2>
   <ul>
-    ${(info.syllabusOutline || []).map((item) => `<li>${item}</li>`).join("")}
+    ${syllabusItems.map((item) => `<li>${item}</li>`).join("")}
   </ul>
 </body>
 </html>`;
@@ -533,92 +693,256 @@
           return;
         }
 
+        if (evt.type === "exportDataTableToSheets") {
+          const comps = payload?.surfaceUpdate?.components || [];
+          const found =
+            comps.find((c) => c.id === evt.tableNodeId && c.component?.DataTable) ||
+            comps.find((c) => c.component?.DataTable);
+          const table = found?.component?.DataTable;
+          if (table) {
+            const dataModel = payload?.dataModelUpdate?.contents || {};
+            const rowsKey = (table.rowsPath || "").replace(/^\//, "");
+            const rows = Array.isArray(dataModel[rowsKey]) ? dataModel[rowsKey] : [];
+            const cols = table.columns || [];
+            const headers = cols.map((c) => c.label);
+            const matrix = [
+              headers,
+              ...rows.map((r) => cols.map((c) => String(r[c.key] ?? "")))
+            ];
+            const csvText =
+              "\uFEFF" +
+              matrix
+                .map((row) =>
+                  row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+                )
+                .join("\r\n");
+            const tsvText = matrix
+              .map((row) => row.map((cell) => String(cell).replace(/[\t\r\n]+/g, " ")).join("\t"))
+              .join("\n");
+
+            navigator.clipboard?.writeText(tsvText).catch(() => {});
+
+            if (evt.exportMode === "sheets_new") {
+              window.open("https://sheets.new", "_blank", "noopener");
+              showToast(
+                "Copied Table & Opened Google Sheets (sheets.new)",
+                `Copied ${rows.length} rows to your clipboard — press Cmd+V (or Ctrl+V) in cell A1 of the new Google Sheet!`
+              );
+            } else {
+              const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `Augustana_AAA_${p.id}_Q${q?.number || 1}_Google_Sheets.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+              showToast(
+                "Exported to Google Sheets (.csv)",
+                `Downloaded Augustana_AAA_${p.id}_Q${q?.number || 1}_Google_Sheets.csv (and copied rows to clipboard for pasting into Google Sheets).`
+              );
+            }
+          }
+          return;
+        }
+
         if (evt.type === "exportSchedule") {
           const dataModel = payload?.dataModelUpdate?.contents || {};
+          const detailsMap = dataModel.courseCatalogDetails || {};
+
+          // Check if we are exporting Student Q2 (Multi-Term Graduation Roadmap)
+          if (Array.isArray(dataModel.gradPathways) && dataModel.gradPathways.length > 0) {
+            const activePw =
+              dataModel.gradPathways.find((p) => p.id === dataModel.activeGradPathwayId) || dataModel.gradPathways[0];
+            const matrix = [
+              [
+                "Semester",
+                "Course Number",
+                "Course Name",
+                "Credits",
+                "Requirement / Pillar",
+                "Cumulative Credits (of 124)",
+                "Target Graduation"
+              ]
+            ];
+
+            let runningCredits = 92;
+            let plannedCreditsTotal = 0;
+
+            (activePw.terms || []).forEach((t) => {
+              const cleanTerm = String(t.termName || "").replace(/\s*\(.*?\)\s*/g, "").trim() || t.termName;
+              (t.courses || []).forEach((c) => {
+                // Parse "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)" into clean columns
+                const codeMatch = String(c).match(/^([A-Z]{3,4}\s+\d{3})\s*[—-]\s*([^(]+?)(?:\s*\((.+)\))?$/);
+                const courseCode = codeMatch ? codeMatch[1].trim() : c;
+                const courseTitle = codeMatch ? codeMatch[2].trim() : (detailsMap[courseCode]?.title || "");
+                const parenText = codeMatch && codeMatch[3] ? codeMatch[3] : "";
+                const crMatch = parenText.match(/(\d+)\s*Cr/i) || String(detailsMap[courseCode]?.credits || "4").match(/(\d+)/);
+                const creditNum = crMatch ? Number(crMatch[1]) : 4;
+                const reqPart = parenText.includes("·")
+                  ? parenText.split("·").slice(1).join("·").trim()
+                  : detailsMap[courseCode]?.pillar || "Degree Requirement";
+
+                runningCredits += creditNum;
+                plannedCreditsTotal += creditNum;
+
+                matrix.push([
+                  cleanTerm,
+                  courseCode,
+                  courseTitle,
+                  creditNum,
+                  reqPart,
+                  `${runningCredits} of 124`,
+                  activePw.graduationDate || "May 2028"
+                ]);
+              });
+            });
+
+            matrix.push([
+              "TOTAL PLANNED",
+              `${matrix.length - 1} Courses`,
+              `92 Earned + ${plannedCreditsTotal} Planned = ${runningCredits} Total Credits`,
+              plannedCreditsTotal,
+              activePw.buttonLabel || "",
+              `${runningCredits} of 124`,
+              activePw.graduationDate || "May 2028"
+            ]);
+
+            const csvText =
+              "\uFEFF" +
+              matrix
+                .map((row) =>
+                  row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")
+                )
+                .join("\r\n");
+            const tsvText = matrix
+              .map((row) => row.map((cell) => String(cell ?? "").replace(/[\t\r\n]+/g, " ")).join("\t"))
+              .join("\n");
+
+            if (evt.exportAction === "download_plan") {
+              navigator.clipboard?.writeText(tsvText).catch(() => {});
+              const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "Augustana_Graduation_Roadmap_Amina_Tesfaye.csv";
+              a.click();
+              URL.revokeObjectURL(url);
+              showToast(
+                "Exported Clean Table to Google Sheets (.csv)",
+                "Downloaded Augustana_Graduation_Roadmap_Amina_Tesfaye.csv (and copied clean spreadsheet rows to clipboard)."
+              );
+            } else if (evt.exportAction === "open_sheets_new") {
+              navigator.clipboard?.writeText(tsvText).catch(() => {});
+              window.open("https://sheets.new", "_blank", "noopener");
+              showToast(
+                "Copied Clean Table & Opened Google Sheets",
+                "Press Cmd+V (or Ctrl+V) in cell A1 of your new Google Sheet!"
+              );
+            } else if (evt.exportAction === "email_advisor") {
+              const termLines = (activePw.terms || [])
+                .map((t) => `${t.termName} (${t.creditsLabel}):\n  - ${(t.courses || []).join("\n  - ")}`)
+                .join("\n\n");
+              const subject = encodeURIComponent(
+                `Graduation Timeline Review (${activePw.graduationDate}) — Amina Tesfaye`
+              );
+              const body = encodeURIComponent(
+                `Dear Dr. Matthewulat,\n\nI explored my multi-term graduation timeline in the Augustana Academic Advising Agent and would like to review this pathway with you:\n\nSelected Pathway: ${activePw.buttonLabel}\nTarget Graduation Date: ${activePw.graduationDate}\n\nTerm-by-Term Plan:\n${termLines}\n\nThank you,\nAmina Tesfaye`
+              );
+              window.location.href = `mailto:m.matthewulat@augie.edu?subject=${subject}&body=${body}`;
+              showToast(
+                "Graduation Plan Email Prepared",
+                "Opened email client with your multi-term graduation roadmap for Dr. Matthewulat."
+              );
+            }
+            return;
+          }
+
           const summary = dataModel.scheduleSummary || {};
           const events = Array.isArray(dataModel.calendarEvents) ? dataModel.calendarEvents : [];
           const slots = Array.isArray(dataModel.contestableSlots) ? dataModel.contestableSlots : [];
-          const detailsMap = dataModel.courseCatalogDetails || {};
+
+          const matrix = [
+            [
+              "Semester",
+              "Course Number",
+              "Course Name",
+              "Credits",
+              "Requirement / Pillar",
+              "Meeting Days & Time",
+              "Location",
+              "Instructor",
+              "Downstream Trade-Off / Note"
+            ]
+          ];
+
+          let totalSpringCredits = 0;
+
+          events.forEach((e) => {
+            const d = detailsMap[e.course] || {};
+            const crMatch = String(d.credits || "4").match(/(\d+)/);
+            const creditNum = crMatch ? Number(crMatch[1]) : 4;
+            totalSpringCredits += creditNum;
+
+            const matchingSlot = slots.find((s) => s.slotId === e.slotId);
+            const chosenOpt = matchingSlot
+              ? (matchingSlot.options || []).find((o) => o.value === matchingSlot.selectedValue)
+              : null;
+
+            matrix.push([
+              "Spring 2027",
+              e.course,
+              e.title,
+              creditNum,
+              d.pillar || e.bucket,
+              d.schedule || `${e.days} ${e.slotId}`,
+              d.location || "Main Campus",
+              d.instructor || "Staff",
+              chosenOpt ? chosenOpt.impact : "Required anchor course"
+            ]);
+          });
+
+          matrix.push([
+            "TOTAL",
+            `${events.length} Courses`,
+            summary.sliceLabel || "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective",
+            totalSpringCredits,
+            summary.f1Status || "Meets 12-Credit Full-Time Minimum",
+            "",
+            "",
+            "Advisor: Dr. Matthewulat",
+            "Ready for Registration Approval"
+          ]);
+
+          const csvText =
+            "\uFEFF" +
+            matrix
+              .map((row) =>
+                row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")
+              )
+              .join("\r\n");
+          const tsvText = matrix
+            .map((row) => row.map((cell) => String(cell ?? "").replace(/[\t\r\n]+/g, " ")).join("\t"))
+            .join("\n");
 
           if (evt.exportAction === "download_plan") {
-            const planHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Spring 2027 Advising & Registration Plan — Amina Tesfaye</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #081E3F; max-width: 820px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.55; }
-    .banner { background: #081E3F; color: #ffffff; border-bottom: 5px solid #FED102; padding: 1.25rem 1.5rem; border-radius: 8px; }
-    .banner h1 { margin: 0.2rem 0; font-size: 1.4rem; }
-    .meta-bar { display: flex; flex-wrap: wrap; gap: 1.25rem; background: #f8fafc; border: 1px solid #cbd5e1; padding: 0.9rem 1.2rem; border-radius: 8px; margin: 1.2rem 0; font-size: 0.92rem; }
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
-    th, td { border: 1px solid #cbd5e1; padding: 0.65rem 0.8rem; text-align: left; font-size: 0.9rem; }
-    th { background: #081E3F; color: #ffffff; }
-    .sig-box { margin-top: 2rem; padding: 1rem 1.2rem; border: 1.5px dashed #081E3F; border-radius: 8px; background: #fffbeb; }
-  </style>
-</head>
-<body>
-  <div class="banner">
-    <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; color:#FED102; font-weight:700;">Augustana University (Sioux Falls, SD) — Academic Advising Agent (AAA)</div>
-    <h1>Spring 2027 Registration Plan — Amina Tesfaye</h1>
-    <div>Prepared for Faculty Advising Session & Registration Approval with Dr. Matthewulat</div>
-  </div>
-  <div class="meta-bar">
-    <div><strong>Chosen Mix:</strong> ${summary.sliceLabel || "Option 1: Balanced Major/Core + Parallel SOPHIA + Elective"}</div>
-    <div><strong>Total Load:</strong> ${summary.totalCredits || "14 Credits (4 Courses)"}</div>
-    <div><strong>F-1 Status:</strong> ${summary.f1Status || "Meets 12-Credit Full-Time Minimum"}</div>
-  </div>
-  <h2>Proposed Monday–Friday Course Schedule</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Course Code</th>
-        <th>Course Name</th>
-        <th>Days & Time</th>
-        <th>Curriculum Pillar</th>
-        <th>Instructor</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${events
-        .map((e) => {
-          const d = detailsMap[e.course] || {};
-          return `<tr>
-            <td><strong>${e.course}</strong></td>
-            <td>${e.title}</td>
-            <td>${d.schedule || `${e.days} ${e.slotId}`}</td>
-            <td>${d.pillar || e.bucket}</td>
-            <td>${d.instructor || "Staff"}</td>
-          </tr>`;
-        })
-        .join("")}
-    </tbody>
-  </table>
-  <h2>Time-Slot Conflict Resolutions & Downstream Notes</h2>
-  <ul>
-    ${slots
-      .map((s) => {
-        const chosen = (s.options || []).find((o) => o.value === s.selectedValue) || (s.options || [])[0];
-        return `<li><strong>${s.timeLabel}:</strong> Selected <strong>${chosen ? `${chosen.course} (${chosen.title})` : s.selectedValue}</strong> — ${chosen ? chosen.impact : ""}</li>`;
-      })
-      .join("")}
-  </ul>
-  <div class="sig-box">
-    <strong>Faculty Advisor Registration Clearance (Dr. Matthewulat):</strong>
-    <p style="margin:0.4rem 0 0;">Advisor Signature / Approval Stamp: _____________________________________ &nbsp;&nbsp; Date: _______________</p>
-  </div>
-</body>
-</html>`;
-            const blob = new Blob([planHtml], { type: "text/html" });
+            navigator.clipboard?.writeText(tsvText).catch(() => {});
+            const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.html";
+            a.download = "Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.csv";
             a.click();
             URL.revokeObjectURL(url);
             showToast(
-              "Advising Plan Soft Copy Exported",
-              "Downloaded Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.html for your advising session."
+              "Exported Advising Plan to Google Sheets (.csv)",
+              "Downloaded Augustana_Spring_2027_Advising_Plan_Amina_Tesfaye.csv (and copied rows to clipboard for Google Sheets)."
+            );
+          } else if (evt.exportAction === "open_sheets_new") {
+            navigator.clipboard?.writeText(tsvText).catch(() => {});
+            window.open("https://sheets.new", "_blank", "noopener");
+            showToast(
+              "Copied Schedule & Opened Google Sheets (sheets.new)",
+              "Press Cmd+V (or Ctrl+V) in cell A1 of your new Google Sheet to paste your Spring 2027 schedule!"
             );
           } else if (evt.exportAction === "email_advisor") {
             const courseLines = events

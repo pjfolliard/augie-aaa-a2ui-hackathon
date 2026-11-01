@@ -141,6 +141,15 @@
         alertMsg: "At Augustana, your Major, Minor, SOPHIA Core, and Electives advance together. Select a semester mix in Step 1 to see the recommended courses in each pillar, use the dropdowns in Step 2 to resolve any time-slot conflicts, and view your Monday-Friday schedule in Step 3.",
         tableTitle: "Reference: Full Course Details & Jenzabar J1 Section Metadata [J1 /recommend-next-term + /catalog/sections]",
         priorityCols: ["course_code", "pillar", "credits", "meeting_window", "seats_left", "downstream_tradeoff"]
+      },
+      2: {
+        layout: "inverted-pyramid",
+        alertSeverity: "info",
+        alertIcon: "",
+        alertTitle: "Projected Graduation Date: May 2028 (92 of 124 Credits Completed — 32 Credits / 8 Courses Remaining)",
+        alertMsg: "You are on track to graduate in May 2028 in 3 standard semesters. Because only 16 of your remaining 32 credits are required Major, Minor, or SOPHIA courses, you have 16 open credits of flexibility to either accelerate your graduation or explore another minor, double major, certificate, or internship.",
+        tableTitle: "Reference: Multi-Term Graduation Audit & Credit Breakdown [J1 /students/me/graduation-audit]",
+        priorityCols: ["course_code", "pillar", "credits", "meeting_window", "downstream_tradeoff"]
       }
     }
   };
@@ -306,8 +315,514 @@
     };
   }
 
+  function buildStudentQ2Payload(basePayload) {
+    const baseData = basePayload?.dataModelUpdate?.contents || {};
+    const courseCatalogDetails = baseData.courseCatalogDetails || {};
+
+    return {
+      surfaceId: "augie-aaa-student-q2-surface",
+      beginRendering: {
+        surfaceId: "augie-aaa-student-q2-surface",
+        root: "root-layout",
+        catalogId: "augie-aaa-a2ui-v1"
+      },
+      surfaceUpdate: {
+        surfaceId: "augie-aaa-student-q2-surface",
+        components: [
+          {
+            id: "root-layout",
+            component: {
+              Column: {
+                children: {
+                  explicitList: [
+                    "student-q2-alert",
+                    "student-q2-kpis",
+                    "student-q2-explorer",
+                    "student-q2-progress",
+                    "student-q2-export"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            id: "student-q2-alert",
+            component: {
+              AlertBanner: {
+                severity: "info",
+                icon: "",
+                title: "Projected Graduation Date: May 2028 (92 of 124 Credits Completed — 32 Credits / 8 Courses Remaining)",
+                message:
+                  "You are on track to graduate in May 2028 in 3 standard semesters. Because only 16 of your remaining 32 credits are required for your Data Science Major, Mathematics Minor, and SOPHIA Core, you have 16 open credits of flexibility. Choose a guided question below to see how you can accelerate your graduation to December 2027 (via J-Term and Summer) or use those 16 open credits to add another minor, certificate, or internship.",
+                jargonTerms: ["SOPHIA", "Residency Requirement", "F-1 Full-Time Load"]
+              }
+            }
+          },
+          {
+            id: "student-q2-kpis",
+            component: {
+              KPIStatRow: {
+                items: [
+                  {
+                    label: "Projected Graduation Term",
+                    value: "May 2028",
+                    trend: "3 Semesters Left · Can Accelerate to Dec 2027",
+                    status: "success",
+                    zionField: "J1: /students/me/graduation-audit"
+                  },
+                  {
+                    label: "Credits Completed vs. Required",
+                    value: "92 / 124 Cr",
+                    trend: "32 Credits Left (16 Required + 16 Open)",
+                    status: "success",
+                    zionField: "J1: degree_rules.degree.credits_earned"
+                  },
+                  {
+                    label: "Augustana Residency Rule",
+                    value: "32 / 32 Cr Met",
+                    trend: "Final 40 Credits On-Campus Rule Satisfied",
+                    status: "success",
+                    zionField: "J1: degree_rules.residency",
+                    jargon: "Residency Requirement"
+                  },
+                  {
+                    label: "F-1 Full-Time Pace",
+                    value: "12+ Cr / Term",
+                    trend: "Full-Time Status Verified Through Graduation",
+                    status: "success",
+                    zionField: "J1: registered_credits >= 12",
+                    jargon: "F-1 Full-Time Load"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            id: "student-q2-explorer",
+            component: {
+              GraduationPathwayExplorer: {
+                title: "Step 1: Guide Your Graduation Timeline — What Would You Like to Do Next?",
+                subtitle:
+                  "Click any follow-up option below to see how maximizing J-Term and Summer classes can accelerate your graduation, or how your 16 open credits can unlock an additional minor, double major, certificate, or internship.",
+                activePathwayPath: "/activeGradPathwayId",
+                pathwaysPath: "/gradPathways",
+                explorationOptionsPath: "/explorationOptions"
+              }
+            }
+          },
+          {
+            id: "student-q2-progress",
+            component: {
+              DegreeProgressCard: {
+                title: "How Your 124 Credits Break Down Under This Graduation Pathway",
+                subtitle: "Real-time comparison of your completed credits (92 cr) and your remaining 32 credits",
+                itemsPath: "/progressItems"
+              }
+            }
+          },
+          {
+            id: "student-q2-export",
+            component: {
+              ScheduleExportCard: {
+                title: "Step 2: Export Your Graduation Roadmap to Google Sheets or Send to Your Advisor",
+                description:
+                  "Export your multi-term graduation timeline to Google Sheets (.csv) or open directly in a new Google Sheet (sheets.new) for your advising session, or email it to Dr. Matthewulat.",
+                advisorName: "Dr. Matthewulat",
+                advisorEmail: "m.matthewulat@augie.edu",
+                exportButtonLabel: "Export Graduation Timeline to Google Sheets (.csv)",
+                emailButtonLabel: "Email Graduation Plan to Dr. Matthewulat"
+              }
+            }
+          },
+          {
+            id: "student-q2-table",
+            component: {
+              DataTable: {
+                title: "Reference: Multi-Term Graduation Audit & Credit Breakdown [J1 /students/me/graduation-audit]",
+                a11yCaption:
+                  "Student Question 2 Graduation Audit Table showing remaining degree requirements, credits needed, target term, and downstream graduation impact.",
+                a11ySummary:
+                  "Lists the 8 remaining courses (32 credits) required to reach 124 credits for graduation.",
+                rowHeaderKey: "course_code",
+                rowsPath: "/rows",
+                columns: [
+                  {
+                    key: "course_code",
+                    label: "Course / Requirement",
+                    zionField: "J1: /students/me/graduation-audit",
+                    type: "string",
+                    sortable: true
+                  },
+                  {
+                    key: "pillar",
+                    label: "Curriculum Pillar",
+                    zionField: "J1: audit.programs[] + audit.gen_ed",
+                    type: "string",
+                    sortable: true
+                  },
+                  {
+                    key: "credits",
+                    label: "Credits",
+                    zionField: "J1: credit_hrs",
+                    type: "number",
+                    sortable: true
+                  },
+                  {
+                    key: "target_term",
+                    label: "Planned Term",
+                    zionField: "J1: term_code",
+                    type: "string",
+                    sortable: true
+                  },
+                  {
+                    key: "downstream_tradeoff",
+                    label: "Graduation Impact",
+                    zionField: "J1: blocks_milestone",
+                    type: "string",
+                    sortable: false
+                  }
+                ],
+                rowActions: []
+              }
+            }
+          }
+        ]
+      },
+      dataModelUpdate: {
+        surfaceId: "augie-aaa-student-q2-surface",
+        contents: {
+          activeGradPathwayId: "baseline_may_2028",
+          gradPathways: [
+            {
+              id: "baseline_may_2028",
+              buttonLabel: "Keep My May 2028 Graduation Pace (Standard 3 Semesters)",
+              shortHook: "10–14 credits per semester · No summer tuition required · 16 open credits for electives & exploration",
+              graduationDate: "May 2028 (3 Semesters Remaining)",
+              jtermSummerSummary: "J-Term Included in Spring Tuition · No Summer Required",
+              guidanceSummary:
+                "You graduate on schedule in May 2028 without needing summer classes. Because you only have 4 required courses (16 credits) left across your Data Science Major, Mathematics Minor, and SOPHIA Core, the remaining 16 credits (4 courses) are completely open for studio electives, a second minor, or research.",
+              terms: [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Completes Senior Capstone, SOPHIA Religion requirement, and 1 Major Core + 1 Elective",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Open Elective)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Senior Fall)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Completes Mathematics Minor and leaves 8 credits open for minors, certificates, or electives",
+                  courses: [
+                    "MATH 310 — Linear Algebra (4 Cr · Completes Mathematics Minor)",
+                    "ART 140 — Studio Ceramics (4 Cr · Creative Arts Exploration)",
+                    "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · Open Elective / Certificate Option)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Graduation)",
+                  creditsLabel: "6–12 Credits (118 -> 124+ of 124 Credits)",
+                  milestoneNote: "Only 6 credits required to reach 124 (Eligible for Final-Term F-1 Reduced Course Load or 12-Cr Full Load)",
+                  courses: [
+                    "COSC 495 — Sioux Falls Industry Data Science Internship (4 Cr · Experiential Capstone)",
+                    "MUSI 118 — History of Jazz (2 Cr · Reaches 124-Credit Graduation Threshold)"
+                  ]
+                }
+              ]
+            },
+            {
+              id: "accelerate_dec_2027",
+              buttonLabel: "Accelerate My Graduation (Finish December 2027 — 1 Semester Early)",
+              shortHook: "Maximize J-Term 2027 (4 cr) + Summer 2027 (4 cr) + 12-cr Fall 2027 · Save Spring 2028 semester",
+              graduationDate: "December 2027 (Graduates 1 Full Semester Early)",
+              jtermSummerSummary: "Maximizes J-Term 2027 (4 Cr) + Summer 2027 (4 Cr)",
+              guidanceSummary:
+                "By taking 1 intensive course during January J-Term 2027 (4 credits, included in full-time tuition) and 1 Summer 2027 course or internship (4 credits), you complete all 124 credits by December 2027—graduating a full semester early and saving Spring 2028 living and tuition expenses.",
+              terms: [
+                {
+                  termName: "J-Term 2027 (January Intensive — Acceleration Step 1)",
+                  creditsLabel: "4 Credits (92 -> 96 of 124 Credits)",
+                  milestoneNote: "Maximizes January J-Term (included in full-time tuition) to knock out 4 credits before Spring starts",
+                  isAcceleratedTerm: true,
+                  courses: [
+                    "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · J-Term Daily Intensive)"
+                  ]
+                },
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "12 Credits (96 -> 108 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Senior Capstone, Applied ML, and Final SOPHIA Requirement",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)"
+                  ]
+                },
+                {
+                  termName: "Summer 2027 (Summer Acceleration Step 2)",
+                  creditsLabel: "4 Credits (108 -> 112 of 124 Credits)",
+                  milestoneNote: "Uses Summer Session (or Sioux Falls CPT Internship) to stay ahead of the 124-credit curve",
+                  isAcceleratedTerm: true,
+                  courses: [
+                    "COSC 495 — Sioux Falls Industry Data Science Internship (4 Cr · Summer Session)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Final Semester — Graduate December 2027!)",
+                  creditsLabel: "12 Credits (112 -> 124 of 124 Credits)",
+                  milestoneNote: "Completes Mathematics Minor + Final 8 Credits -> Confer Degree in December 2027",
+                  isAcceleratedTerm: true,
+                  courses: [
+                    "MATH 310 — Linear Algebra (4 Cr · Completes Mathematics Minor)",
+                    "ART 140 — Studio Ceramics (4 Cr · Upper-Level Elective)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Career Elective)",
+                    "MUSI 118 — History of Jazz (2 Cr · Reaches 124.0 Credits in December 2027)"
+                  ]
+                }
+              ]
+            },
+            {
+              id: "explore_majors_minors",
+              buttonLabel: "Explore Adding Another Minor, Double Major, or Certificate (May 2028)",
+              shortHook: "Use your 16 open credits to add a Studio Art Minor, AI Ethics Certificate, or Math Double Major",
+              graduationDate: "May 2028 (With Added Minor / Double Major Credential)",
+              jtermSummerSummary: "Standard Semesters · Zero Extra Tuition Required",
+              highlightedExplorationId: "math_double_major",
+              guidanceSummary:
+                "Because you only need 16 credits to finish your Data Science Major, Mathematics Minor, and SOPHIA Core, your remaining 16 credits (out of 32 needed for 124) can be bundled into a formal second credential—such as upgrading your Math Minor to a Double Major, or adding a Studio Art Minor—while still graduating on time in May 2028.",
+              terms: [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Advances Data Science Major + SOPHIA + First Exploration Course",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Major Core)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Counts toward AI Ethics Certificate)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Credential Expansion Semester)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Uses open credits toward Second Minor / Double Major Courses",
+                  courses: [
+                    "MATH 310 — Linear Algebra (4 Cr · Math Minor / Double Major Core)",
+                    "MATH 320 — Probability & Mathematical Statistics (4 Cr · Upgrades toward Math Double Major)",
+                    "ART 140 — Studio Ceramics (4 Cr · Or swap for PHIL 230 to complete AI Ethics Certificate)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Graduate With Added Credential)",
+                  creditsLabel: "8–12 Credits (118 -> 126 of 124 Credits)",
+                  milestoneNote: "Completes Second Credential + 124-Credit Graduation Requirement on Time",
+                  courses: [
+                    "MATH 410 — Real Analysis (4 Cr · Completes Mathematics Double Major Track)",
+                    "ART 180 — Digital Design & Visual Communication (4 Cr · Studio Art & Design Minor Track)"
+                  ]
+                }
+              ]
+            },
+            {
+              id: "experiential_internship_abroad",
+              buttonLabel: "Add Study Abroad or a Sioux Falls Industry Internship (May 2028)",
+              shortHook: "Fit a J-Term Study Abroad or 4-credit Sanford/Avera/Citibank Data Science Internship into your plan",
+              graduationDate: "May 2028 (Includes J-Term Study Abroad + Industry Internship)",
+              jtermSummerSummary: "J-Term Study Abroad + Fall/Spring Sioux Falls Practicum",
+              guidanceSummary:
+                "Your 16 open credits give you the breathing room to participate in an off-campus J-Term study abroad course AND complete a 4-credit supervised Data Science internship in Sioux Falls (F-1 CPT eligible) without delaying your May 2028 graduation.",
+              terms: [
+                {
+                  termName: "Spring 2027 (Upcoming Semester)",
+                  creditsLabel: "14 Credits (92 -> 106 of 124 Credits)",
+                  milestoneNote: "Completes Data Science Capstone & Machine Learning Prereq for Industry Internship",
+                  courses: [
+                    "COSC 450 — Data Science Senior Capstone (4 Cr · Major Required)",
+                    "DATA 340 — Applied Machine Learning (4 Cr · Unlocks Industry Internship Eligibility)",
+                    "RELI 218 — Global Christianities (4 Cr · Completes Final SOPHIA Requirement)",
+                    "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Career Elective)"
+                  ]
+                },
+                {
+                  termName: "Fall 2027 (Sioux Falls Industry Internship Term)",
+                  creditsLabel: "12 Credits (106 -> 118 of 124 Credits)",
+                  milestoneNote: "Pairs 150-hour Sioux Falls Data Science Practicum (F-1 CPT eligible) with Linear Algebra",
+                  courses: [
+                    "COSC 495 — Sioux Falls Industry Data Science Internship (4 Cr · Sanford / Avera / Citibank Partner)",
+                    "MATH 310 — Linear Algebra (4 Cr · Completes Mathematics Minor)",
+                    "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · Ethical AI Seminar)"
+                  ]
+                },
+                {
+                  termName: "Spring 2028 (Final Semester — Studio & Creative Finish)",
+                  creditsLabel: "6–12 Credits (118 -> 124 of 124 Credits)",
+                  milestoneNote: "Light final semester focused on creative exploration and career transition",
+                  courses: [
+                    "ART 140 — Studio Ceramics (4 Cr · Creative Arts Elective)",
+                    "MUSI 118 — History of Jazz (2 Cr · Completes 124 Credits for May 2028 Commencement)"
+                  ]
+                }
+              ]
+            }
+          ],
+          explorationOptions: [
+            {
+              id: "math_double_major",
+              credentialType: "Upgrade Minor -> Double Major",
+              creditsRequired: "12 Open Credits Needed",
+              title: "Mathematics Double Major (Add to Data Science)",
+              shortButtonLabel: "Math Double Major",
+              fitExplanation:
+                "You already completed 16 of 20 credits for the Mathematics Minor. Because Data Science and Mathematics share foundational courses, adding 3 upper-level MATH courses uses 12 of your 16 open credits and upgrades your minor to a full second major by May 2028.",
+              sampleCourses: [
+                "MATH 310 — Linear Algebra (4 Cr · Already in Your Plan)",
+                "MATH 320 — Probability & Mathematical Statistics (4 Cr · Fall 2027)",
+                "MATH 410 — Real Analysis (4 Cr · Spring 2028)"
+              ]
+            },
+            {
+              id: "studio_art_minor",
+              credentialType: "New Liberal Arts Minor",
+              creditsRequired: "12 Open Credits Needed",
+              title: "Studio Art & Visual Design Minor",
+              shortButtonLabel: "Studio Art Minor",
+              fitExplanation:
+                "Combine technical Data Science with creative visual design. Taking 3 studio art courses fits completely inside your 16 open elective credits with 4 credits still to spare.",
+              sampleCourses: [
+                "ART 140 — Studio Ceramics (4 Cr · Spring 2027 or Fall 2027)",
+                "ART 180 — Digital Design & Visual Communication (4 Cr · Fall 2027)",
+                "ART 240 — Intermediate Ceramic Sculpture (4 Cr · Spring 2028)"
+              ]
+            },
+            {
+              id: "ai_ethics_cert",
+              credentialType: "Interdisciplinary Certificate + Internship",
+              creditsRequired: "10 Open Credits Needed",
+              title: "AI Ethics Certificate + Sioux Falls Internship",
+              shortButtonLabel: "AI Ethics + Internship",
+              fitExplanation:
+                "Pair human-centered computing and AI ethics with a supervised 4-credit Data Science internship at a Sioux Falls employer—leaving 6 open credits for music or studio art.",
+              sampleCourses: [
+                "COSC 315 — Accessible Human-Computer Interaction (2 Cr · Spring 2027)",
+                "PHIL 230 — Ethics of Artificial Intelligence & Data (4 Cr · J-Term or Fall 2027)",
+                "COSC 495 — Sioux Falls Industry Data Science Internship (4 Cr · Summer or Fall 2027)"
+              ]
+            }
+          ],
+          progressItems: [
+            {
+              label: "Total Graduation Credits (92 Earned + 32 Planned = 124 Cr)",
+              current: 92,
+              target: 124,
+              unit: "cr",
+              ZionField: "J1: degree_rules.degree.credits_earned"
+            },
+            {
+              label: "Data Science Major Core (36 Earned + 8 Required = 44 Cr)",
+              current: 36,
+              target: 44,
+              unit: "cr",
+              ZionField: "J1: audit.programs[major]"
+            },
+            {
+              label: "Mathematics Minor (16 Earned + 4 Required = 20 Cr)",
+              current: 16,
+              target: 20,
+              unit: "cr",
+              ZionField: "J1: audit.programs[minor]"
+            },
+            {
+              label: "SOPHIA Liberal Arts Core (10 Earned + 1 Required = 11 Courses)",
+              current: 10,
+              target: 11,
+              unit: "courses",
+              ZionField: "J1: audit.gen_ed.remaining_count"
+            },
+            {
+              label: "Open Exploration Credits (16 of 32 Remaining Credits Available for Minors / J-Term / Electives)",
+              current: 16,
+              target: 16,
+              unit: "open cr",
+              ZionField: "J1: 124 - required_remaining"
+            }
+          ],
+          rows: [
+            {
+              course_code: "COSC 450 — Data Science Senior Capstone",
+              pillar: "Major Core (Required)",
+              credits: 4,
+              target_term: "Spring 2027",
+              downstream_tradeoff: "Spring-only senior sequence; required for May 2028 or Dec 2027 graduation"
+            },
+            {
+              course_code: "DATA 340 — Applied Machine Learning",
+              pillar: "Major Core (Required)",
+              credits: 4,
+              target_term: "Spring 2027",
+              downstream_tradeoff: "Completes Data Science major core and unlocks COSC 495 Internship"
+            },
+            {
+              course_code: "RELI 218 — Global Christianities",
+              pillar: "SOPHIA Core (Final Requirement)",
+              credits: 4,
+              target_term: "Spring 2027",
+              downstream_tradeoff: "Satisfies final SOPHIA Learning Outcome (11 of 11 complete)"
+            },
+            {
+              course_code: "MATH 310 — Linear Algebra",
+              pillar: "Mathematics Minor (Final Requirement)",
+              credits: 4,
+              target_term: "Fall 2027 (or Spring 2027)",
+              downstream_tradeoff: "Completes 20-credit Mathematics Minor (or counts toward Math Double Major)"
+            },
+            {
+              course_code: "Open Exploration Slot 1 (e.g., PHIL 230 or MATH 320)",
+              pillar: "Open Credit (Accelerate via J-Term or Add Minor)",
+              credits: 4,
+              target_term: "J-Term 2027 or Fall 2027",
+              downstream_tradeoff: "Take in J-Term 2027 to accelerate graduation to Dec 2027, or apply toward a 2nd Minor"
+            },
+            {
+              course_code: "Open Exploration Slot 2 (e.g., COSC 495 Internship or ART 140)",
+              pillar: "Open Credit (Accelerate via Summer or Add Minor)",
+              credits: 4,
+              target_term: "Summer 2027 or Fall 2027",
+              downstream_tradeoff: "Take in Summer 2027 to graduate in Dec 2027, or use for Studio Art Minor / Internship"
+            },
+            {
+              course_code: "Open Exploration Slot 3 (e.g., ART 180 or MATH 410)",
+              pillar: "Open Credit (Minor / Double Major / Elective)",
+              credits: 4,
+              target_term: "Fall 2027 or Spring 2028",
+              downstream_tradeoff: "Completes added Minor/Double Major or advances toward 124 total credits"
+            },
+            {
+              course_code: "Open Exploration Slot 4 (e.g., COSC 315 + MUSI 118)",
+              pillar: "Open Credit (Career & Liberal Arts Electives)",
+              credits: 4,
+              target_term: "Spring 2027 / Spring 2028",
+              downstream_tradeoff: "Brings cumulative earned credits from 120 to 124.0 for degree conferral"
+            }
+          ],
+          courseCatalogDetails
+        }
+      }
+    };
+  }
+
   function adaptPayloadForQuestion(basePayload, persona, question) {
     if (!basePayload || !question) return { payload: basePayload, recommendedLayout: "inverted-pyramid" };
+
+    if (persona?.id === "student" && question?.number === 2) {
+      return {
+        payload: buildStudentQ2Payload(basePayload),
+        recommendedLayout: "inverted-pyramid"
+      };
+    }
 
     const clone = JSON.parse(JSON.stringify(basePayload));
     const bp = inferQuestionBlueprint(persona, question);

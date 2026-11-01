@@ -1615,6 +1615,18 @@ html.a11y-scale-150 .a2ui-row-table-wide {
 }
 
 /* Step 4 ScheduleExportCard */
+.a2ui-export-instructions {
+  padding: 0.85rem 1.25rem;
+  background: var(--augie-gold-soft);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--augie-navy);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
 .a2ui-export-actions-bar {
   display: flex;
   flex-wrap: wrap;
@@ -1746,4 +1758,111 @@ html.a11y-scale-150 .a2ui-row-table-wide {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+/* Student Q2: GraduationPathwayExplorer */
+.a2ui-grad-pathway-callout {
+  margin: 0.9rem 1.25rem 0.25rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--augie-light-blue-soft);
+  border-left: 4px solid var(--augie-navy);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.a2ui-grad-roadmap-section {
+  padding: 0.75rem 0 0.25rem;
+}
+
+.a2ui-grad-section-heading {
+  margin: 0.25rem 1.25rem 0.65rem;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--augie-navy);
+}
+
+.a2ui-term-accelerated {
+  background: var(--augie-gold-soft);
+  border-color: var(--augie-navy);
+  border-width: 2px;
+}
+
+.a2ui-grad-explore-section {
+  padding: 1rem 1.25rem 1.35rem;
+  border-top: 1.5px solid var(--border-subtle);
+  background: var(--bg-subtle);
+}
+
+.a2ui-grad-explore-header {
+  margin-bottom: 0.95rem;
+}
+
+.a2ui-grad-explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1rem;
+}
+
+.a2ui-grad-explore-card {
+  background: #ffffff;
+  border: 1.5px solid var(--border-subtle);
+  border-top: 4px solid var(--augie-navy);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.a2ui-grad-explore-card.is-highlighted {
+  border-color: var(--augie-navy);
+  border-top-color: var(--augie-gold);
+  box-shadow: 0 4px 14px rgba(8, 30, 63, 0.12);
+}
+
+.a2ui-grad-explore-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.a2ui-grad-explore-type {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--augie-navy);
+}
+
+.a2ui-grad-explore-title {
+  margin: 0.1rem 0;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--augie-navy);
+}
+
+.a2ui-grad-explore-desc {
+  margin: 0 0 0.35rem;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.a2ui-grad-explore-courses-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--augie-navy);
+}
+
+.a2ui-explore-apply-btn {
+  margin-top: auto;
+  width: 100%;
+  justify-content: center;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
 }

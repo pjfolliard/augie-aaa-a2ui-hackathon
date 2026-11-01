@@ -219,6 +219,18 @@
         "exportButtonLabel": { "type": "string" },
         "emailButtonLabel": { "type": "string" }
       }
+    },
+    "GraduationPathwayExplorer": {
+      "geminiEnterprisePrimitive": "MaterialCard + MaterialTabs + MaterialList + MaterialExpansionPanel",
+      "description": "Interactive graduation timeline and follow-up goal explorer allowing students to simulate accelerating graduation via J-Term/Summer, exploring a second minor or certificate with open elective credits, or adding Study Abroad/Internships.",
+      "required": ["title", "pathwaysPath", "activePathwayPath"],
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "activePathwayPath": { "type": "string" },
+        "pathwaysPath": { "type": "string" },
+        "explorationOptionsPath": { "type": "string" }
+      }
     }
   }
 }

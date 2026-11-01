@@ -1067,11 +1067,11 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
           id: "action-card",
           component: {
             ScheduleExportCard: {
-              title: "Export Advising Plan or Email Advisor for Registration Approval",
-              description: "Download a clean soft copy of your Spring 2027 schedule and trade-off summary to bring to your advising session, or email it directly to Dr. Matthewulat to request registration approval.",
+              title: "Export Advising Plan to Google Sheets or Email Advisor for Registration Approval",
+              description: "Export your Spring 2027 schedule and trade-off notes as a Google Sheets spreadsheet (.csv) or open directly in a new Google Sheet (sheets.new) for your advising session, or email Dr. Matthewulat for registration approval.",
               advisorName: "Dr. Matthewulat",
               advisorEmail: "m.matthewulat@augie.edu",
-              exportButtonLabel: "Export Advising Plan (Soft Copy for Advising Session)",
+              exportButtonLabel: "Export Advising Plan to Google Sheets (.csv)",
               emailButtonLabel: "Email Plan to Dr. Matthewulat for Registration Approval"
             }
           }
@@ -1510,6 +1510,120 @@ window.AUGIE_DEFAULT_A2UI_VIEWS = {
               "Era 1: Blues, Ragtime & Early New Orleans Polyphony",
               "Era 2: Duke Ellington, Swing Big Bands & the Bebop Revolution",
               "Era 3: Modal Jazz, Miles Davis, John Coltrane & Modern Voices"
+            ]
+          },
+          "ART 180": {
+            code: "ART 180",
+            title: "Digital Design & Visual Communication",
+            credits: "4 Credits",
+            pillar: "Studio Art & Design Minor / Elective",
+            instructor: "Prof. Shields",
+            schedule: "Fall 2027 · Mon / Wed / Fri 11:00 AM",
+            location: "Center for Visual Arts 204",
+            seats: "18 of 20 Seats Projected (Jenzabar J1)",
+            prerequisites: "None — Counts toward Studio Art Minor",
+            shortHover: "ART 180 (4 Cr): Typography, vector illustration & interactive visual systems. Click for syllabus.",
+            description: "Foundations of digital design, typography, grid systems, color theory, and visual storytelling. Students build a portfolio of print and interactive digital artifacts.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/art-180-syllabus.pdf",
+            syllabusHighlights: [
+              "Unit 1: Typography, Hierarchy & Swiss Grid Systems",
+              "Unit 2: Vector Identity Systems & Accessible Color Contrast",
+              "Unit 3: Interactive Prototyping & Design Critique"
+            ]
+          },
+          "ART 240": {
+            code: "ART 240",
+            title: "Intermediate Ceramic Sculpture",
+            credits: "4 Credits",
+            pillar: "Studio Art & Design Minor",
+            instructor: "Prof. Peters",
+            schedule: "Spring 2028 · Tue / Thu 1:30 – 3:20 PM",
+            location: "Center for Visual Arts 102",
+            seats: "12 of 14 Seats Projected (Jenzabar J1)",
+            prerequisites: "ART 140 (Studio Ceramics)",
+            shortHover: "ART 240 (4 Cr): Advanced sculptural ceramics & glaze formulation. Completes Studio Art Minor.",
+            description: "Builds on ART 140 with large-scale hand-building, modular wheel-thrown forms, experimental atmospheric firing, and contemporary ceramic theory.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/art-240-syllabus.pdf",
+            syllabusHighlights: [
+              "Studio Project 1: Modular Architectural Vessels",
+              "Studio Project 2: Custom Glaze Chemistry & Kiln Loading",
+              "Studio Project 3: Senior Gallery Installation"
+            ]
+          },
+          "PHIL 230": {
+            code: "PHIL 230",
+            title: "Ethics of Artificial Intelligence & Data",
+            credits: "4 Credits",
+            pillar: "AI & Data Ethics Certificate / SOPHIA",
+            instructor: "Dr. O'Hara",
+            schedule: "J-Term 2027 or Fall 2027 · Daily Intensive",
+            location: "Madsen Social Science Center 208",
+            seats: "15 of 24 Seats Remaining (Jenzabar J1)",
+            prerequisites: "Sophomore Standing",
+            shortHover: "PHIL 230 (4 Cr): Algorithmic fairness, privacy, and human agency in AI systems. Click for syllabus.",
+            description: "Examines ethical frameworks for algorithmic decision-making, training-data bias, surveillance, intellectual property, and human dignity in healthcare, finance, and civic life.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/phil-230-syllabus.pdf",
+            syllabusHighlights: [
+              "Module 1: Deontological, Utilitarian & Virtue Ethics in Computing",
+              "Module 2: Algorithmic Bias, Fairness Audits & Explainability",
+              "Module 3: Governance, Privacy & AI Policy Case Studies"
+            ]
+          },
+          "MATH 320": {
+            code: "MATH 320",
+            title: "Probability & Mathematical Statistics",
+            credits: "4 Credits",
+            pillar: "Mathematics Double Major / Minor",
+            instructor: "Dr. Gregg",
+            schedule: "Fall 2027 · Mon / Wed / Fri 10:00 AM",
+            location: "Frohreich Science Center 312",
+            seats: "14 of 22 Seats Projected (Jenzabar J1)",
+            prerequisites: "MATH 152 (Calculus II)",
+            shortHover: "MATH 320 (4 Cr): Continuous distributions, limit theorems & statistical inference. Click for syllabus.",
+            description: "Rigorous treatment of combinatorial probability, random variables, joint distributions, moment-generating functions, the Central Limit Theorem, and maximum-likelihood estimation.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/math-320-syllabus.pdf",
+            syllabusHighlights: [
+              "Unit 1: Axiomatic Probability & Multivariate Distributions",
+              "Unit 2: Expectation, Variance & Law of Large Numbers",
+              "Unit 3: Point Estimation & Hypothesis Testing Theory"
+            ]
+          },
+          "MATH 410": {
+            code: "MATH 410",
+            title: "Real Analysis",
+            credits: "4 Credits",
+            pillar: "Mathematics Double Major",
+            instructor: "Dr.Knudson",
+            schedule: "Spring 2028 · Mon / Wed / Fri 9:00 AM",
+            location: "Frohreich Science Center 308",
+            seats: "10 of 16 Seats Projected (Jenzabar J1)",
+            prerequisites: "MATH 310 (Linear Algebra)",
+            shortHover: "MATH 410 (4 Cr): Sequences, metric spaces, continuity & Riemann integration. Completes Math Double Major.",
+            description: "Proof-based investigation of the real number system, completeness, sequences and series, continuity, differentiation, and the Riemann integral.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/math-410-syllabus.pdf",
+            syllabusHighlights: [
+              "Unit 1: Completeness Axiom, Topology of R & Convergence",
+              "Unit 2: Uniform Continuity & Differentiability Theorems",
+              "Unit 3: Riemann Integrability & Sequences of Functions"
+            ]
+          },
+          "COSC 495": {
+            code: "COSC 495",
+            title: "Sioux Falls Industry Data Science Internship",
+            credits: "4 Credits",
+            pillar: "Experiential Learning / Major Elective",
+            instructor: "Dr. Matthewulat",
+            schedule: "Summer 2027 or Fall 2027 · 150 Practicum Hours",
+            location: "Sioux Falls Partner Site (Sanford Health / Avera / Citibank)",
+            seats: "Open by Faculty & Career Center Approval",
+            prerequisites: "DATA 340 & Junior/Senior Standing",
+            shortHover: "COSC 495 (4 Cr): Supervised applied data science internship in Sioux Falls. F-1 CPT eligible.",
+            description: "Supervised professional data science practicum with a Sioux Falls healthcare, biotech, or fintech organization. Eligible for F-1 Curricular Practical Training (CPT) authorization.",
+            syllabusUrl: "https://www.augie.edu/academics/catalog/cosc-495-syllabus.pdf",
+            syllabusHighlights: [
+              "Phase 1: Learning Contract & F-1 CPT / Career Center Clearance",
+              "Phase 2: Bi-Weekly Technical Deliverables & Faculty Check-Ins",
+              "Phase 3: Executive Poster Presentation & Portfolio Reflection"
             ]
           }
         }

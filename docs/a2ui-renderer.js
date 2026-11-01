@@ -671,6 +671,174 @@
         `;
       }
 
+      if (comp.GraduationPathwayExplorer) {
+        const gpe = comp.GraduationPathwayExplorer;
+        const pathways = resolvePointer(dataModel, gpe.pathwaysPath) || [];
+        const activePathwayId = resolvePointer(dataModel, gpe.activePathwayPath) || pathways[0]?.id || "baseline_may_2028";
+        const activePathway = pathways.find((p) => p.id === activePathwayId) || pathways[0] || {};
+        const explorationOptions = resolvePointer(dataModel, gpe.explorationOptionsPath) || [];
+        const courseCatalog = resolvePointer(dataModel, "/courseCatalogDetails") || {};
+
+        return `
+          <section class="a2ui-card a2ui-grad-explorer-card" role="region" aria-label="${escapeHtml(gpe.title)}">
+            <div class="a2ui-card-header">
+              <div>
+                <h3 class="a2ui-card-title">${escapeHtml(gpe.title)}</h3>
+                <p class="a2ui-card-subtitle">${escapeHtml(gpe.subtitle || "")}</p>
+              </div>
+              <span class="a2ui-catalog-tag">A2UI v0.9 GraduationPathwayExplorer · Guided Follow-Up Goals</span>
+            </div>
+
+            <div class="a2ui-priority-modes" role="group" aria-label="Follow-up questions and graduation goal pathways">
+              ${pathways
+                .map((pw) => {
+                  const isSel = pw.id === activePathwayId;
+                  return `
+                    <button
+                      type="button"
+                      class="a2ui-priority-pill ${isSel ? "is-active" : ""}"
+                      aria-pressed="${isSel ? "true" : "false"}"
+                      data-grad-pathway="${escapeHtml(pw.id)}"
+                    >
+                      <div class="priority-pill-title">${escapeHtml(pw.buttonLabel)}</div>
+                      <div class="priority-pill-desc">${escapeHtml(pw.shortHook)}</div>
+                    </button>
+                  `;
+                })
+                .join("")}
+            </div>
+
+            <div class="a2ui-schedule-summary-bar" style="border-top: 1px solid var(--border-subtle);">
+              <div class="sched-pill">
+                <span class="sched-pill-label">Selected Pathway:</span>
+                <strong>${escapeHtml(activePathway.buttonLabel || "")}</strong>
+              </div>
+              <div class="sched-pill">
+                <span class="sched-pill-label">Target Graduation Date:</span>
+                <strong>${escapeHtml(activePathway.graduationDate || "May 2028")}</strong>
+              </div>
+              <div class="sched-pill">
+                <span class="sched-pill-label">J-Term &amp; Summer Usage:</span>
+                <strong>${escapeHtml(activePathway.jtermSummerSummary || "Optional")}</strong>
+              </div>
+            </div>
+
+            <div class="a2ui-grad-pathway-callout">
+              <strong>How This Shapes Your Augustana Experience:</strong> ${escapeHtml(activePathway.guidanceSummary || "")}
+            </div>
+
+            <div class="a2ui-grad-roadmap-section">
+              <h4 class="a2ui-grad-section-heading">Term-by-Term Roadmap to 124 Credits (${escapeHtml(activePathway.graduationDate || "May 2028")})</h4>
+              <div class="a2ui-pillars-list">
+                ${(activePathway.terms || [])
+                  .map(
+                    (term) => `
+                  <div class="a2ui-pillar-row ${term.isAcceleratedTerm ? "a2ui-term-accelerated" : ""}">
+                    <div class="a2ui-pillar-info">
+                      <div class="a2ui-pillar-header">
+                        <h4 class="a2ui-pillar-name">${escapeHtml(term.termName)}</h4>
+                        <span class="a2ui-pillar-credits">${escapeHtml(term.creditsLabel)}</span>
+                      </div>
+                      <div class="a2ui-pillar-status">${escapeHtml(term.milestoneNote)}</div>
+                    </div>
+                    <div class="a2ui-pillar-courses">
+                      <div class="a2ui-pillar-courses-heading">Planned Courses in This Term (Click Any Course for Description &amp; Syllabus):</div>
+                      <ul class="a2ui-pillar-course-list">
+                        ${(term.courses || [])
+                          .map((c) => {
+                            const codeMatch = String(c).match(/^([A-Z]{3,4}\s+\d{3})/);
+                            const code = codeMatch ? codeMatch[1] : "";
+                            const meta = code && courseCatalog[code] ? courseCatalog[code] : null;
+                            if (code && meta) {
+                              return `<li>
+                                <button
+                                  type="button"
+                                  class="course-inspect-link"
+                                  data-course-code="${escapeHtml(code)}"
+                                  title="${escapeHtml(meta.shortHover || `${code}: Click to view course description and syllabus`)}"
+                                >
+                                  <span>${escapeHtml(c)}</span>
+                                  <span class="course-inspect-hint">Description &amp; Syllabus</span>
+                                </button>
+                              </li>`;
+                            }
+                            return `<li>${escapeHtml(c)}</li>`;
+                          })
+                          .join("")}
+                      </ul>
+                    </div>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            </div>
+
+            ${
+              explorationOptions.length
+                ? `
+              <div class="a2ui-grad-explore-section">
+                <div class="a2ui-grad-explore-header">
+                  <h4 class="a2ui-grad-section-heading" style="margin:0;">Invite to Explore: Majors, Minors &amp; Certificates That Fit Your 16 Open Credits</h4>
+                  <p class="a2ui-card-subtitle" style="margin:0.2rem 0 0;">
+                    You only have 16 required Major/Minor/SOPHIA credits left out of the 32 credits needed to reach 124. Here is how you can use your 16 open credits without delaying your May 2028 graduation:
+                  </p>
+                </div>
+                <div class="a2ui-grad-explore-grid">
+                  ${explorationOptions
+                    .map(
+                      (opt) => `
+                    <div class="a2ui-grad-explore-card ${activePathway.highlightedExplorationId === opt.id ? "is-highlighted" : ""}">
+                      <div class="a2ui-grad-explore-top">
+                        <span class="a2ui-grad-explore-type">${escapeHtml(opt.credentialType)}</span>
+                        <span class="a2ui-pillar-credits">${escapeHtml(opt.creditsRequired)}</span>
+                      </div>
+                      <h5 class="a2ui-grad-explore-title">${escapeHtml(opt.title)}</h5>
+                      <p class="a2ui-grad-explore-desc">${escapeHtml(opt.fitExplanation)}</p>
+                      <div class="a2ui-grad-explore-courses-label">Key Courses to Explore (Click for Description &amp; Syllabus):</div>
+                      <ul class="a2ui-pillar-course-list" style="margin-bottom:0.75rem;">
+                        ${(opt.sampleCourses || [])
+                          .map((c) => {
+                            const codeMatch = String(c).match(/^([A-Z]{3,4}\s+\d{3})/);
+                            const code = codeMatch ? codeMatch[1] : "";
+                            const meta = code && courseCatalog[code] ? courseCatalog[code] : null;
+                            if (code && meta) {
+                              return `<li>
+                                <button
+                                  type="button"
+                                  class="course-inspect-link"
+                                  data-course-code="${escapeHtml(code)}"
+                                  title="${escapeHtml(meta.shortHover || `${code}: Click to view course description and syllabus`)}"
+                                >
+                                  <span>${escapeHtml(c)}</span>
+                                  <span class="course-inspect-hint">Description &amp; Syllabus</span>
+                                </button>
+                              </li>`;
+                            }
+                            return `<li>${escapeHtml(c)}</li>`;
+                          })
+                          .join("")}
+                      </ul>
+                      <button
+                        type="button"
+                        class="btn-augie-outline a2ui-explore-apply-btn"
+                        data-explore-program="${escapeHtml(opt.id)}"
+                      >
+                        <span>Simulate Adding ${escapeHtml(opt.shortButtonLabel || opt.title)} to My Graduation Plan</span>
+                      </button>
+                    </div>
+                  `
+                    )
+                    .join("")}
+                </div>
+              </div>
+            `
+                : ""
+            }
+          </section>
+        `;
+      }
+
       if (comp.ScheduleExportCard) {
         const exp = comp.ScheduleExportCard;
         return `
@@ -680,11 +848,19 @@
                 <h3 class="a2ui-card-title">${escapeHtml(exp.title)}</h3>
                 <p class="a2ui-card-subtitle">${escapeHtml(exp.description || "")}</p>
               </div>
-              <span class="a2ui-catalog-tag">A2UI v0.9 A2A File Part Export &amp; Advisor Approval</span>
+              <span class="a2ui-catalog-tag">A2UI v0.9 Google Workspace Sheets &amp; Advisor Handoff</span>
+            </div>
+            <div class="a2ui-export-instructions">
+              <div><strong>How to open in Google Sheets:</strong></div>
+              <div>1. Click <strong>"Copy &amp; Open in Google Sheets (sheets.new)"</strong> below — your formatted table is automatically copied to your clipboard and a new Google Sheet opens.</div>
+              <div>2. Click cell <strong>A1</strong> in the new Google Sheet and press <strong>Cmd+V</strong> (Mac) or <strong>Ctrl+V</strong> (Windows) to paste all columns, or click <strong>"Export to Google Sheets (.csv)"</strong> to download a spreadsheet file.</div>
             </div>
             <div class="a2ui-export-actions-bar">
-              <button type="button" class="btn-augie-primary btn-export-softcopy" data-export-action="download_plan">
-                <span>${escapeHtml(exp.exportButtonLabel || "Download / Print Advising Plan (Soft Copy for Advising Session)")}</span>
+              <button type="button" class="btn-augie-primary btn-open-sheets" data-export-action="open_sheets_new">
+                <span>Copy &amp; Open in Google Sheets (sheets.new)</span>
+              </button>
+              <button type="button" class="btn-augie-outline btn-export-softcopy" data-export-action="download_plan">
+                <span>${escapeHtml(exp.exportButtonLabel || "Export to Google Sheets (.csv)")}</span>
               </button>
               <button type="button" class="btn-augie-outline btn-email-advisor" data-export-action="email_advisor" data-advisor-email="${escapeHtml(exp.advisorEmail || "m.matthewulat@augie.edu")}" data-advisor-name="${escapeHtml(exp.advisorName || "Dr. Matthewulat")}">
                 <span>${escapeHtml(exp.emailButtonLabel || "Email Plan to Advisor for Registration Approval")}</span>
@@ -725,7 +901,13 @@
                 <h3 class="a2ui-card-title">${escapeHtml(table.title)}</h3>
                 <p id="${descId}" class="a2ui-card-subtitle">${escapeHtml(table.a11ySummary || table.a11yCaption || "")}</p>
               </div>
-              <div class="a2ui-card-actions">
+              <div class="a2ui-card-actions" style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem;">
+                <button type="button" class="a2ui-action-btn" data-table-export="csv" data-table-node="${escapeHtml(nodeId)}" aria-label="Export ${escapeHtml(table.title)} to Google Sheets CSV">
+                  <span>Export to Google Sheets (.csv)</span>
+                </button>
+                <button type="button" class="a2ui-action-btn" data-table-export="sheets_new" data-table-node="${escapeHtml(nodeId)}" aria-label="Copy ${escapeHtml(table.title)} and open a new Google Sheet">
+                  <span>Open in Google Sheets (sheets.new)</span>
+                </button>
                 <span class="a2ui-catalog-tag">A2UI v0.9 MaterialTable · DataTable · ${rows.length} Rows</span>
               </div>
             </div>
@@ -897,12 +1079,36 @@
     });
 
     // Bind PriorityTradeoffExplorer mode buttons
-    container.querySelectorAll(".a2ui-priority-pill").forEach((btn) => {
+    container.querySelectorAll("[data-priority-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const modeId = btn.getAttribute("data-priority-mode");
         onAction({
           type: "prioritySliceChange",
           modeId,
+          surfaceId: payload.surfaceId
+        });
+      });
+    });
+
+    // Bind GraduationPathwayExplorer follow-up pathway buttons (Student Q2)
+    container.querySelectorAll("[data-grad-pathway]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const pathwayId = btn.getAttribute("data-grad-pathway");
+        onAction({
+          type: "gradPathwayChange",
+          pathwayId,
+          surfaceId: payload.surfaceId
+        });
+      });
+    });
+
+    // Bind GraduationPathwayExplorer program exploration buttons (Student Q2)
+    container.querySelectorAll("[data-explore-program]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const programId = btn.getAttribute("data-explore-program");
+        onAction({
+          type: "exploreProgramSimulate",
+          programId,
           surfaceId: payload.surfaceId
         });
       });
@@ -952,8 +1158,22 @@
       });
     });
 
+    // Bind DataTable Google Sheets / CSV export buttons (Global across all 10 personas)
+    container.querySelectorAll("[data-table-export]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const exportMode = btn.getAttribute("data-table-export");
+        const tableNodeId = btn.getAttribute("data-table-node");
+        onAction({
+          type: "exportDataTableToSheets",
+          exportMode,
+          tableNodeId,
+          surfaceId: payload.surfaceId
+        });
+      });
+    });
+
     // Bind row action buttons
-    container.querySelectorAll(".a2ui-action-btn").forEach((btn) => {
+    container.querySelectorAll("[data-action-id]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const actId = btn.getAttribute("data-action-id");
         const target = btn.getAttribute("data-row-target");
